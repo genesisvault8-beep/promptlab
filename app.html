@@ -501,9 +501,9 @@
 
       <div class="sec-label" style="margin-bottom:8px">MODEL</div>
       <div class="model-row">
-        <button class="model-btn active" onclick="selectModel(this,'qwen-plus')">Qwen Plus</button>
-        <button class="model-btn" onclick="selectModel(this,'qwen-turbo')">Qwen Turbo</button>
-        <button class="model-btn" onclick="selectModel(this,'qwen-max')">Qwen Max</button>
+        <button class="model-btn active" onclick="selectModel(this,'qwen/qwen-plus')">Qwen Plus</button>
+        <button class="model-btn" onclick="selectModel(this,'qwen/qwen-turbo')">Qwen Turbo</button>
+        <button class="model-btn" onclick="selectModel(this,'qwen/qwen-max')">Qwen Max</button>
       </div>
 
       <div class="sec-label" style="margin-bottom:8px">PARAMETERS</div>
@@ -663,9 +663,9 @@
     </div>
     <div class="modal-body">
       <div class="modal-desc">
-        Enter your Qwen Cloud API key. It's stored only in your browser — never sent anywhere except Qwen Cloud's API directly.
+        Enter your OpenRouter API key. Sign up free at openrouter.ai — gives you access to Qwen Plus, Turbo and Max. Key stays in your browser only.
         <br><br>
-        Get your key at <span style="color:var(--accent)">dashscope.console.aliyuncs.com</span>
+        Get your key at <span style="color:var(--accent)">openrouter.ai/keys</span>
       </div>
       <div class="sec-label" style="margin-bottom:6px">YOUR API KEY</div>
       <input type="password" id="key-input" placeholder="sk-ant-..." autocomplete="off" spellcheck="false">
@@ -683,11 +683,11 @@
 // ══════════════════════════════════════
 // STATE
 // ══════════════════════════════════════
-let currentModel = 'qwen-plus';
+let currentModel = 'qwen/qwen-plus';
 let currentCat = 'all';
 let outputText = '';
 let savedPrompts = JSON.parse(localStorage.getItem('promptlab-saved') || '[]');
-let apiKey = localStorage.getItem('promptlab-qwen-key') || '';
+let apiKey = localStorage.getItem('promptlab-openrouter-key') || '';
 
 // ══════════════════════════════════════
 // API KEY
@@ -716,7 +716,7 @@ function saveKey() {
   const val = document.getElementById('key-input').value.trim();
   if (!val) { showToast('Enter an API key'); return; }
   apiKey = val;
-  localStorage.setItem('promptlab-qwen-key', val);
+  localStorage.setItem('promptlab-openrouter-key', val);
   updateKeyStatus();
   closeKeyModal();
   showToast('API key saved ✓');
@@ -739,11 +739,13 @@ async function callClaude(systemPrompt, userPrompt, maxTokens = 500) {
   const tempVal = parseFloat(document.getElementById('temp-val').textContent);
   if (!isNaN(tempVal)) body.temperature = tempVal;
 
-  const response = await fetch('https://dashscope-intl.aliyuncs.com/compatible-mode/v1/chat/completions', {
+  const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${apiKey}`,
+      'HTTP-Referer': 'https://promptlab.genesisvault.xyz',
+      'X-Title': 'PromptLab',
     },
     body: JSON.stringify(body)
   });
