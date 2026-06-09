@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>PromptLab — App</title>
+<title>PromptLab — Qwen Cloud Edition</title>
 <meta name="theme-color" content="#0c0c0e">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -465,8 +465,9 @@
 
       <div class="sec-label" style="margin-bottom:8px">MODEL</div>
       <div class="model-row">
-        <button class="model-btn active" onclick="selectModel(this,'claude-sonnet-4-20250514')">Sonnet 4</button>
-        <button class="model-btn" onclick="selectModel(this,'claude-haiku-4-5-20251001')">Haiku 4.5</button>
+        <button class="model-btn active" onclick="selectModel(this,'qwen-plus')">Qwen Plus</button>
+        <button class="model-btn" onclick="selectModel(this,'qwen-turbo')">Qwen Turbo</button>
+        <button class="model-btn" onclick="selectModel(this,'qwen-max')">Qwen Max</button>
       </div>
 
       <div class="sec-label" style="margin-bottom:8px">PARAMETERS</div>
@@ -583,9 +584,9 @@
     </div>
     <div class="modal-body">
       <div class="modal-desc">
-        Enter your Anthropic API key. It's stored only in your browser localStorage — never sent to any server except Anthropic's API directly.
+        Enter your Qwen Cloud API key. It's stored only in your browser — never sent anywhere except Qwen Cloud's API directly.
         <br><br>
-        Get your key at <span style="color:var(--accent)">console.anthropic.com</span>
+        Get your key at <span style="color:var(--accent)">dashscope.console.aliyuncs.com</span>
       </div>
       <div class="sec-label" style="margin-bottom:6px">YOUR API KEY</div>
       <input type="password" id="key-input" placeholder="sk-ant-..." autocomplete="off" spellcheck="false">
@@ -603,11 +604,11 @@
 // ══════════════════════════════════════
 // STATE
 // ══════════════════════════════════════
-let currentModel = 'claude-sonnet-4-20250514';
+let currentModel = 'qwen-plus';
 let currentCat = 'all';
 let outputText = '';
 let savedPrompts = JSON.parse(localStorage.getItem('promptlab-saved') || '[]');
-let apiKey = localStorage.getItem('promptlab-key') || '';
+let apiKey = localStorage.getItem('promptlab-qwen-key') || '';
 
 // ══════════════════════════════════════
 // API KEY
@@ -636,7 +637,7 @@ function saveKey() {
   const val = document.getElementById('key-input').value.trim();
   if (!val) { showToast('Enter an API key'); return; }
   apiKey = val;
-  localStorage.setItem('promptlab-key', val);
+  localStorage.setItem('promptlab-qwen-key', val);
   updateKeyStatus();
   closeKeyModal();
   showToast('API key saved ✓');
@@ -646,32 +647,31 @@ function saveKey() {
 // CLAUDE API
 // ══════════════════════════════════════
 async function callClaude(systemPrompt, userPrompt, maxTokens = 500) {
-  if (!apiKey) { openKeyModal(); throw new Error('No API key set — add your Anthropic key first.'); }
+  if (!apiKey) { openKeyModal(); throw new Error('No API key — add your Qwen Cloud API key first.'); }
 
   const body = {
     model: currentModel,
     max_tokens: maxTokens,
-    messages: [{ role: 'user', content: userPrompt }]
+    messages: []
   };
-  if (systemPrompt && systemPrompt.trim()) body.system = systemPrompt;
+  if (systemPrompt && systemPrompt.trim()) body.messages.push({ role: 'system', content: systemPrompt });
+  body.messages.push({ role: 'user', content: userPrompt });
 
   const tempVal = parseFloat(document.getElementById('temp-val').textContent);
   if (!isNaN(tempVal)) body.temperature = tempVal;
 
-  const response = await fetch('https://api.anthropic.com/v1/messages', {
+  const response = await fetch('https://dashscope-intl.aliyuncs.com/compatible-mode/v1/chat/completions', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'x-api-key': apiKey,
-      'anthropic-version': '2023-06-01',
-      'anthropic-dangerous-direct-browser-access': 'true'
+      'Authorization': `Bearer ${apiKey}`,
     },
     body: JSON.stringify(body)
   });
 
   const data = await response.json();
-  if (data.error) throw new Error(data.error.message);
-  return data.content.map(c => c.text || '').join('');
+  if (data.error) throw new Error(data.error.message || JSON.stringify(data.error));
+  return data.choices?.[0]?.message?.content || '';
 }
 
 // ══════════════════════════════════════
