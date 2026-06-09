@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>PromptLab — AI Prompt Engineering Workspace</title>
-<meta name="description" content="Test, compare and save AI prompts. Bring your own Anthropic key. No accounts. No servers. Just pure prompt engineering.">
+<meta name="description" content="Test, compare and save AI prompts. Bring your own Qwen Cloud key. No accounts. No servers. Just pure prompt engineering.">
 <meta name="theme-color" content="#0c0c0e">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icons/icon-192.png">
@@ -302,7 +302,10 @@
 <nav>
   <div class="nav-logo">PROMPT<span>LAB</span></div>
   <div class="nav-badge">● BYOK — ZERO SERVER</div>
-  <a href="app.html" class="nav-cta">LAUNCH APP</a>
+  <div style="display:flex;align-items:center;gap:8px">
+    <div style="font-size:9px;letter-spacing:1px;color:var(--accent);border:1px solid var(--accent-dim);padding:4px 10px;border-radius:4px;background:rgba(232,255,71,0.05)">◈ QWEN CLOUD</div>
+    <a href="app.html" class="nav-cta">▶ APP</a>
+  </div>
 </nav>
 
 <section class="hero">
@@ -315,11 +318,11 @@
     Better <span class="accent">Prompts.</span>
   </h1>
   <p class="hero-sub">
-    Write, test, compare and save AI prompts with real Claude output.
-    Bring your own API key — we store nothing, send nothing, charge nothing.
+    Auto-engineer, test, compare and save AI prompts powered by Qwen AI.
+    Bring your own Qwen Cloud key — we store nothing, send nothing, charge nothing.
   </p>
   <div class="hero-actions">
-    <a href="app.html" class="btn-primary">▶ LAUNCH APP</a>
+    <a href="app.html#agent" class="btn-primary">⚡ TRY THE AGENT</a>
     <a href="#features" class="btn-secondary">SEE FEATURES</a>
   </div>
 </section>
@@ -329,13 +332,20 @@
   <div class="features-grid">
     <div class="feature-card">
       <div class="feature-icon">⚡</div>
-      <div class="feature-title">PROMPT EDITOR</div>
-      <div class="feature-desc">Write system + user prompts, pick your model, tune max tokens. Run against real Claude and see output instantly.</div>
+      <div class="feature-title">PROMPT AGENT</div>
+      <div class="feature-desc">Describe your goal — the agent generates 3 variations, tests them all against Qwen, judges the winner and refines it automatically. Zero manual iteration.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">📖</div>
+      <div class="feature-title">STYLE EXTRACTOR</div>
+      <div class="feature-desc">Paste any novel, story or article. The agent extracts the writing style, tone and patterns and turns them into reusable prompt templates.</div>
+    </div>
+      <div class="feature-desc">Write system + user prompts, pick your model, tune max tokens. Run against real Qwen models and see output instantly.</div>
     </div>
     <div class="feature-card">
       <div class="feature-icon">⚖️</div>
       <div class="feature-title">COMPARE MODE</div>
-      <div class="feature-desc">Run two prompt variations simultaneously. Claude judges which output is better — real AI scoring, not random numbers.</div>
+      <div class="feature-desc">Run two prompt variations simultaneously. Qwen AI judges which output is better — real AI scoring, not random numbers.</div>
     </div>
     <div class="feature-card">
       <div class="feature-icon">📚</div>
@@ -355,7 +365,7 @@
     <div class="feature-card">
       <div class="feature-icon">🔑</div>
       <div class="feature-title">BYOK — YOUR KEY</div>
-      <div class="feature-desc">Paste your Anthropic key once. It stays in your browser. We never see it, never store it, never touch your usage.</div>
+      <div class="feature-desc">Paste your Qwen Cloud key once. It stays in your browser. We never see it, never store it, never touch your usage.</div>
     </div>
   </div>
 </section>
@@ -364,15 +374,15 @@
   <div class="byok-inner">
     <div class="byok-title">Bring Your Own <span>Key</span></div>
     <p class="byok-desc">
-      PromptLab calls Claude directly from your browser using your Anthropic API key.
-      Zero middlemen. Zero markup. You pay Anthropic's standard rates — nothing extra.
+      PromptLab calls Qwen Cloud directly from your browser using your API key.
+      Zero middlemen. Zero markup. You pay Qwen Cloud's standard rates — nothing extra.
     </p>
     <div class="byok-flow">
       <div class="flow-step">Your API Key</div>
       <div class="flow-arrow">→</div>
       <div class="flow-step">Your Browser</div>
       <div class="flow-arrow">→</div>
-      <div class="flow-step">Anthropic API</div>
+      <div class="flow-step">Qwen Cloud API</div>
       <div class="flow-arrow">→</div>
       <div class="flow-step">Real Output</div>
     </div>
@@ -407,7 +417,7 @@
     <span>By GenesisVault</span>
     <a href="app.html" style="color:var(--accent);text-decoration:none">Launch App →</a>
   </div>
-  <div class="footer-copy">© 2025 GENESISVAULT.XYZ</div>
+  <div class="footer-copy">© 2026 GENESISVAULT.XYZ</div>
 </footer>
 
 </body>
