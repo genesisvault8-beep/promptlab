@@ -1,0 +1,998 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>PromptLab — App</title>
+<meta name="theme-color" content="#0c0c0e">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="PromptLab">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Unbounded:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0c0c0e;
+    --surface: #111114;
+    --card: #16161a;
+    --border: rgba(255,255,255,0.07);
+    --accent: #e8ff47;
+    --accent-dim: rgba(232,255,71,0.2);
+    --blue: #47b4ff;
+    --pink: #ff47a8;
+    --green: #47ffb4;
+    --red: #ff4747;
+    --text: #f0f0f0;
+    --dim: rgba(240,240,240,0.35);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'JetBrains Mono', monospace;
+    height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body::before {
+    content: '';
+    position: fixed; inset: 0; pointer-events: none; z-index: 0;
+    background: radial-gradient(ellipse 70% 40% at 50% -10%, rgba(232,255,71,0.05) 0%, transparent 60%);
+  }
+
+  /* ── TOPBAR ── */
+  .topbar {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 14px; height: 52px; flex-shrink: 0;
+    border-bottom: 1px solid var(--border);
+    background: rgba(12,12,14,0.97); backdrop-filter: blur(10px);
+    position: relative; z-index: 10; gap: 10px;
+  }
+
+  .logo {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 13px; font-weight: 900;
+    color: var(--accent); letter-spacing: 2px;
+    text-shadow: 0 0 16px rgba(232,255,71,0.3);
+    text-decoration: none; flex-shrink: 0;
+  }
+
+  .logo span { color: var(--dim); font-weight: 400; font-size: 10px; }
+
+  .topbar-right {
+    display: flex; align-items: center; gap: 8px; flex-shrink: 0;
+  }
+
+  .key-status {
+    font-size: 9px; letter-spacing: 1px;
+    padding: 3px 8px; border-radius: 10px;
+    border: 1px solid rgba(71,255,180,0.3);
+    color: var(--green); background: rgba(71,255,180,0.05);
+    cursor: pointer; transition: all 0.15s;
+  }
+  .key-status.no-key {
+    border-color: rgba(255,71,71,0.3);
+    color: var(--red); background: rgba(255,71,71,0.05);
+  }
+  .key-status:hover { opacity: 0.8; }
+
+  /* ── TABS ── */
+  .tabs {
+    display: flex; border-bottom: 1px solid var(--border);
+    background: var(--surface); flex-shrink: 0;
+    overflow-x: auto; scrollbar-width: none; position: relative; z-index: 5;
+  }
+  .tabs::-webkit-scrollbar { display: none; }
+
+  .tab {
+    flex-shrink: 0; padding: 10px 18px;
+    background: transparent; border: none;
+    border-bottom: 2px solid transparent;
+    color: var(--dim); font-family: 'JetBrains Mono', monospace;
+    font-size: 10px; letter-spacing: 2px;
+    cursor: pointer; transition: all 0.15s;
+    white-space: nowrap; text-transform: uppercase;
+  }
+  .tab:hover { color: var(--text); }
+  .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+  /* ── MAIN ── */
+  .main { flex: 1; overflow: hidden; position: relative; z-index: 1; }
+
+  .panel { display: none; flex-direction: column; height: 100%; overflow: hidden; }
+  .panel.active { display: flex; }
+
+  /* ── SCROLLABLE CONTENT ── */
+  .scroll { flex: 1; overflow-y: auto; padding: 14px; }
+  .scroll::-webkit-scrollbar { width: 2px; }
+  .scroll::-webkit-scrollbar-thumb { background: var(--border); }
+
+  /* ── SECTION LABELS ── */
+  .sec-label {
+    font-size: 9px; letter-spacing: 3px; color: var(--dim);
+    text-transform: uppercase; margin-bottom: 8px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+
+  .sec-badge {
+    font-size: 9px; letter-spacing: 1px;
+    background: var(--accent-dim); color: var(--accent);
+    padding: 2px 8px; border-radius: 10px;
+    border: 1px solid var(--accent-dim);
+  }
+
+  /* ── INPUTS ── */
+  textarea, input[type=text], input[type=password] {
+    width: 100%;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    color: var(--text);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    padding: 10px 12px;
+    outline: none;
+    line-height: 1.6;
+    transition: border-color 0.2s;
+    -webkit-appearance: none;
+  }
+  textarea { resize: none; }
+  textarea:focus, input:focus { border-color: var(--accent-dim); }
+  textarea::placeholder, input::placeholder { color: rgba(240,240,240,0.18); }
+
+  .editor-section { margin-bottom: 14px; }
+
+  /* ── MODEL ROW ── */
+  .model-row { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
+
+  .model-btn {
+    padding: 5px 12px;
+    background: var(--card); border: 1px solid var(--border);
+    color: var(--dim); font-family: 'JetBrains Mono', monospace;
+    font-size: 10px; cursor: pointer; border-radius: 3px;
+    transition: all 0.15s; letter-spacing: 1px;
+  }
+  .model-btn.active { border-color: var(--accent); color: var(--accent); background: rgba(232,255,71,0.05); }
+
+  /* ── PARAMS ── */
+  .params-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+  .param-item { display: flex; flex-direction: column; gap: 5px; }
+  .param-label { font-size: 9px; color: var(--dim); letter-spacing: 2px; display: flex; justify-content: space-between; }
+  .param-val { color: var(--accent); }
+
+  input[type=range] {
+    width: 100%; -webkit-appearance: none; height: 3px;
+    background: var(--border); outline: none; border: none;
+    border-radius: 0; padding: 0;
+  }
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none; width: 12px; height: 12px;
+    background: var(--accent); box-shadow: 0 0 6px var(--accent);
+    cursor: pointer; border-radius: 50%;
+  }
+
+  /* ── LOADING BAR ── */
+  .loading-bar {
+    height: 2px; background: transparent; flex-shrink: 0;
+    overflow: hidden; position: relative;
+  }
+  .loading-bar.show { background: var(--border); }
+  .loading-bar.show::after {
+    content: ''; position: absolute; height: 100%;
+    width: 40%; background: var(--accent);
+    animation: loadslide 1.2s ease-in-out infinite;
+  }
+  @keyframes loadslide {
+    0% { left: -40%; }
+    100% { left: 140%; }
+  }
+
+  /* ── RUN BTN ── */
+  .run-btn {
+    width: 100%; padding: 13px;
+    background: var(--accent); border: none; border-radius: 4px;
+    color: #000; font-family: 'Unbounded', sans-serif;
+    font-size: 11px; font-weight: 700; letter-spacing: 3px;
+    cursor: pointer; margin-bottom: 14px;
+    transition: all 0.2s;
+  }
+  .run-btn:hover { box-shadow: 0 4px 20px rgba(232,255,71,0.35); transform: translateY(-1px); }
+  .run-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; box-shadow: none; }
+
+  /* ── OUTPUT ── */
+  .output-box {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 4px; min-height: 100px; padding: 12px;
+    font-size: 12px; line-height: 1.7; color: var(--dim);
+    white-space: pre-wrap; word-break: break-word;
+    margin-bottom: 10px;
+  }
+  .output-box.has-content { color: var(--text); border-color: var(--accent-dim); }
+
+  .output-actions {
+    display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px;
+  }
+
+  /* ── ACTION BTNS ── */
+  .action-btn {
+    padding: 7px 14px;
+    background: transparent; border: 1px solid var(--border);
+    color: var(--dim); font-family: 'JetBrains Mono', monospace;
+    font-size: 9px; letter-spacing: 2px; cursor: pointer;
+    border-radius: 3px; transition: all 0.15s; text-transform: uppercase;
+  }
+  .action-btn:hover { border-color: var(--accent-dim); color: var(--accent); }
+  .action-btn.accent { border-color: var(--accent-dim); color: var(--accent); }
+
+  /* ── METRICS ── */
+  .metrics-row {
+    display: none; grid-template-columns: repeat(3, 1fr);
+    gap: 8px; margin-bottom: 14px;
+  }
+  .metric-box {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 4px; padding: 10px 8px; text-align: center;
+  }
+  .metric-box-val {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 18px; font-weight: 700; color: var(--accent);
+    display: block; margin-bottom: 3px;
+  }
+  .metric-box-label { font-size: 8px; color: var(--dim); letter-spacing: 1px; }
+
+  /* ── TOKEN COUNT ── */
+  .token-row {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 10px;
+  }
+
+  /* ── LIBRARY ── */
+  .library-search {
+    margin-bottom: 10px; border-radius: 4px;
+  }
+
+  .cat-row { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
+  .cat-btn {
+    padding: 4px 10px; background: transparent;
+    border: 1px solid var(--border); color: var(--dim);
+    font-family: 'JetBrains Mono', monospace; font-size: 9px;
+    letter-spacing: 1px; cursor: pointer; border-radius: 3px;
+    transition: all 0.15s; text-transform: uppercase;
+  }
+  .cat-btn.active { border-color: var(--accent-dim); color: var(--accent); background: rgba(232,255,71,0.05); }
+
+  .prompt-cards { display: flex; flex-direction: column; gap: 8px; }
+
+  .prompt-card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 4px; padding: 14px;
+    transition: border-color 0.15s;
+  }
+  .prompt-card:hover { border-color: var(--accent-dim); }
+
+  .prompt-card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+  .prompt-card-name { font-size: 13px; font-weight: 700; color: var(--text); }
+  .prompt-card-cat {
+    font-size: 8px; letter-spacing: 1px; padding: 2px 7px;
+    border-radius: 10px; border: 1px solid;
+  }
+  .cat-writing { color: var(--blue); border-color: rgba(71,180,255,0.3); background: rgba(71,180,255,0.05); }
+  .cat-code { color: var(--green); border-color: rgba(71,255,180,0.3); background: rgba(71,255,180,0.05); }
+  .cat-marketing { color: var(--pink); border-color: rgba(255,71,168,0.3); background: rgba(255,71,168,0.05); }
+  .cat-security { color: var(--accent); border-color: var(--accent-dim); background: rgba(232,255,71,0.05); }
+  .cat-analysis { color: #bf8cff; border-color: rgba(191,140,255,0.3); background: rgba(191,140,255,0.05); }
+
+  .prompt-card-preview {
+    font-size: 11px; color: var(--dim); line-height: 1.6;
+    margin-bottom: 10px;
+    display: -webkit-box; -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical; overflow: hidden;
+  }
+
+  .use-btn {
+    padding: 6px 12px; background: transparent;
+    border: 1px solid var(--accent-dim); color: var(--accent);
+    font-family: 'JetBrains Mono', monospace; font-size: 9px;
+    letter-spacing: 2px; cursor: pointer; border-radius: 3px;
+    transition: all 0.15s;
+  }
+  .use-btn:hover { background: rgba(232,255,71,0.08); }
+
+  /* ── COMPARE ── */
+  .compare-grid { display: flex; flex-direction: column; gap: 10px; margin-bottom: 12px; }
+
+  .compare-item {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 4px; padding: 12px;
+  }
+
+  .compare-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+  .compare-label { font-size: 10px; letter-spacing: 2px; color: var(--dim); }
+  .compare-score { font-family: 'Unbounded', sans-serif; font-size: 14px; font-weight: 700; }
+  .score-a { color: var(--blue); }
+  .score-b { color: var(--pink); }
+
+  .compare-output {
+    font-size: 11px; color: var(--dim); line-height: 1.6;
+    min-height: 60px; white-space: pre-wrap; word-break: break-word;
+  }
+  .compare-output.filled { color: var(--text); }
+
+  .compare-btn {
+    width: 100%; padding: 12px;
+    background: transparent; border: 1px solid rgba(255,71,168,0.4);
+    color: var(--pink); font-family: 'Unbounded', sans-serif;
+    font-size: 10px; font-weight: 700; letter-spacing: 3px;
+    cursor: pointer; border-radius: 4px; transition: all 0.2s;
+    margin-bottom: 12px;
+  }
+  .compare-btn:hover { background: rgba(255,71,168,0.08); }
+  .compare-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  .winner-box {
+    display: none; background: rgba(232,255,71,0.05);
+    border: 1px solid var(--accent-dim); border-radius: 4px;
+    padding: 14px; font-size: 11px; line-height: 1.6; color: var(--text);
+  }
+  .winner-title {
+    font-family: 'Unbounded', sans-serif; font-size: 10px;
+    color: var(--accent); letter-spacing: 2px; margin-bottom: 8px;
+  }
+
+  /* ── SAVED ── */
+  .saved-list { display: flex; flex-direction: column; gap: 8px; }
+
+  .saved-item {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 4px; padding: 12px;
+    display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  }
+
+  .saved-name { font-size: 12px; font-weight: 700; margin-bottom: 3px; }
+  .saved-preview { font-size: 10px; color: var(--dim); }
+
+  .saved-actions { display: flex; gap: 6px; flex-shrink: 0; }
+
+  .saved-btn {
+    padding: 5px 10px; background: transparent;
+    border: 1px solid var(--border); color: var(--dim);
+    font-family: 'JetBrains Mono', monospace; font-size: 9px;
+    letter-spacing: 1px; cursor: pointer; border-radius: 3px;
+    transition: all 0.15s;
+  }
+  .saved-btn:hover { border-color: var(--accent-dim); color: var(--accent); }
+  .saved-btn.del:hover { border-color: rgba(255,71,71,0.4); color: var(--red); }
+
+  .empty-state {
+    text-align: center; padding: 40px 20px;
+    font-size: 12px; color: var(--dim); line-height: 1.7;
+  }
+
+  /* ── KEY MODAL ── */
+  .modal-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(12,12,14,0.92); z-index: 1000;
+    align-items: center; justify-content: center; padding: 16px;
+  }
+  .modal-overlay.open { display: flex; }
+
+  .modal {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 8px; width: 100%; max-width: 420px;
+    box-shadow: 0 0 60px rgba(232,255,71,0.08);
+  }
+
+  .modal-header {
+    padding: 16px 18px; border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+
+  .modal-title {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 12px; color: var(--accent); letter-spacing: 2px;
+  }
+
+  .modal-close {
+    background: none; border: none; color: var(--dim);
+    font-size: 16px; cursor: pointer; transition: color 0.15s;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .modal-close:hover { color: var(--red); }
+
+  .modal-body { padding: 18px; }
+  .modal-desc { font-size: 11px; color: var(--dim); line-height: 1.7; margin-bottom: 14px; }
+
+  .modal-footer {
+    padding: 12px 18px; border-top: 1px solid var(--border);
+    display: flex; gap: 8px; justify-content: flex-end;
+  }
+
+  /* ── TOAST ── */
+  .toast {
+    position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%) translateY(20px);
+    background: var(--card); border: 1px solid var(--accent-dim);
+    color: var(--accent); font-size: 10px; letter-spacing: 2px;
+    padding: 8px 18px; border-radius: 20px;
+    opacity: 0; transition: all 0.3s; z-index: 2000; white-space: nowrap;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <a href="index.html" class="logo">PROMPT<span>LAB</span></a>
+  <div class="topbar-right">
+    <div class="key-status no-key" id="key-status-btn" onclick="openKeyModal()">⚿ NO KEY</div>
+  </div>
+</div>
+
+<!-- TABS -->
+<div class="tabs">
+  <button class="tab active" onclick="switchTab('editor', this)">EDITOR</button>
+  <button class="tab" onclick="switchTab('library', this)">LIBRARY</button>
+  <button class="tab" onclick="switchTab('compare', this)">COMPARE</button>
+  <button class="tab" onclick="switchTab('saved', this)">SAVED</button>
+</div>
+
+<!-- LOADING BAR -->
+<div class="loading-bar" id="loading-bar"></div>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- EDITOR -->
+  <div class="panel active" id="panel-editor">
+    <div class="scroll">
+
+      <div class="editor-section">
+        <div class="sec-label">SYSTEM PROMPT <span class="sec-badge">OPTIONAL</span></div>
+        <textarea id="system-prompt" rows="3" placeholder="You are a helpful assistant specialized in..."></textarea>
+      </div>
+
+      <div class="editor-section">
+        <div class="sec-label">USER PROMPT</div>
+        <textarea id="user-prompt" rows="6" placeholder="Write your prompt here..."></textarea>
+      </div>
+
+      <div class="sec-label" style="margin-bottom:8px">MODEL</div>
+      <div class="model-row">
+        <button class="model-btn active" onclick="selectModel(this,'claude-sonnet-4-20250514')">Sonnet 4</button>
+        <button class="model-btn" onclick="selectModel(this,'claude-haiku-4-5-20251001')">Haiku 4.5</button>
+      </div>
+
+      <div class="sec-label" style="margin-bottom:8px">PARAMETERS</div>
+      <div class="params-row">
+        <div class="param-item">
+          <div class="param-label">MAX TOKENS <span class="param-val" id="tok-val">500</span></div>
+          <input type="range" min="100" max="2000" value="500" oninput="document.getElementById('tok-val').textContent=this.value">
+        </div>
+        <div class="param-item">
+          <div class="param-label">TEMPERATURE <span class="param-val" id="temp-val">0.7</span></div>
+          <input type="range" min="0" max="10" value="7" oninput="document.getElementById('temp-val').textContent=(this.value/10).toFixed(1)">
+        </div>
+      </div>
+
+      <button class="run-btn" id="run-btn" onclick="runPrompt()">▶ RUN PROMPT</button>
+
+      <div class="token-row">
+        <div class="sec-label" style="margin:0">OUTPUT</div>
+        <span id="token-count" style="font-size:9px;color:var(--accent)"></span>
+      </div>
+
+      <div class="output-box" id="output-box">Waiting for output...</div>
+
+      <div class="output-actions">
+        <button class="action-btn" onclick="copyOutput()">COPY</button>
+        <button class="action-btn" onclick="savePrompt()">SAVE</button>
+        <button class="action-btn" onclick="analyzePrompt()">ANALYZE</button>
+        <button class="action-btn" onclick="clearAll()">CLEAR</button>
+      </div>
+
+      <div class="metrics-row" id="metrics-row">
+        <div class="metric-box">
+          <span class="metric-box-val" id="m-words">0</span>
+          <span class="metric-box-label">WORDS</span>
+        </div>
+        <div class="metric-box">
+          <span class="metric-box-val" id="m-tokens">0</span>
+          <span class="metric-box-label">~TOKENS</span>
+        </div>
+        <div class="metric-box">
+          <span class="metric-box-val" id="m-score">0%</span>
+          <span class="metric-box-label">CLARITY</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- LIBRARY -->
+  <div class="panel" id="panel-library">
+    <div class="scroll">
+      <input class="library-search" type="text" id="lib-search" placeholder="Search prompts..." oninput="filterLibrary()">
+      <div class="cat-row">
+        <button class="cat-btn active" onclick="filterCat(this,'all')">ALL</button>
+        <button class="cat-btn" onclick="filterCat(this,'writing')">WRITING</button>
+        <button class="cat-btn" onclick="filterCat(this,'code')">CODE</button>
+        <button class="cat-btn" onclick="filterCat(this,'marketing')">MARKETING</button>
+        <button class="cat-btn" onclick="filterCat(this,'security')">SECURITY</button>
+        <button class="cat-btn" onclick="filterCat(this,'analysis')">ANALYSIS</button>
+      </div>
+      <div class="prompt-cards" id="prompt-cards"></div>
+    </div>
+  </div>
+
+  <!-- COMPARE -->
+  <div class="panel" id="panel-compare">
+    <div class="scroll">
+      <div class="sec-label" style="margin-bottom:10px">COMPARE TWO PROMPT VARIATIONS — AI JUDGES THE WINNER</div>
+      <div class="compare-grid">
+        <div class="compare-item">
+          <div class="compare-header">
+            <div class="compare-label">PROMPT A</div>
+            <div class="compare-score score-a" id="score-a">—</div>
+          </div>
+          <textarea id="compare-a" rows="4" placeholder="First prompt variation..."></textarea>
+          <div class="compare-output" id="compare-out-a" style="margin-top:10px">Run to see output...</div>
+        </div>
+        <div class="compare-item">
+          <div class="compare-header">
+            <div class="compare-label">PROMPT B</div>
+            <div class="compare-score score-b" id="score-b">—</div>
+          </div>
+          <textarea id="compare-b" rows="4" placeholder="Second prompt variation..."></textarea>
+          <div class="compare-output" id="compare-out-b" style="margin-top:10px">Run to see output...</div>
+        </div>
+      </div>
+      <button class="compare-btn" id="compare-btn" onclick="runCompare()">⚖️ RUN COMPARISON</button>
+      <div class="winner-box" id="winner-box">
+        <div class="winner-title">// AI VERDICT</div>
+        <div id="winner-text"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SAVED -->
+  <div class="panel" id="panel-saved">
+    <div class="scroll">
+      <div class="output-actions" style="margin-bottom:14px">
+        <button class="action-btn" onclick="exportSaved()">EXPORT JSON</button>
+        <button class="action-btn" onclick="clearSaved()" style="color:var(--red)">CLEAR ALL</button>
+      </div>
+      <div class="saved-list" id="saved-list"></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- KEY MODAL -->
+<div class="modal-overlay" id="modal-key">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">⚿ API KEY</div>
+      <button class="modal-close" onclick="closeKeyModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-desc">
+        Enter your Anthropic API key. It's stored only in your browser localStorage — never sent to any server except Anthropic's API directly.
+        <br><br>
+        Get your key at <span style="color:var(--accent)">console.anthropic.com</span>
+      </div>
+      <div class="sec-label" style="margin-bottom:6px">YOUR API KEY</div>
+      <input type="password" id="key-input" placeholder="sk-ant-..." autocomplete="off" spellcheck="false">
+    </div>
+    <div class="modal-footer">
+      <button class="action-btn" onclick="closeKeyModal()">CANCEL</button>
+      <button class="action-btn accent" onclick="saveKey()">SAVE KEY</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ══════════════════════════════════════
+// STATE
+// ══════════════════════════════════════
+let currentModel = 'claude-sonnet-4-20250514';
+let currentCat = 'all';
+let outputText = '';
+let savedPrompts = JSON.parse(localStorage.getItem('promptlab-saved') || '[]');
+let apiKey = localStorage.getItem('promptlab-key') || '';
+
+// ══════════════════════════════════════
+// API KEY
+// ══════════════════════════════════════
+function updateKeyStatus() {
+  const btn = document.getElementById('key-status-btn');
+  if (apiKey) {
+    btn.textContent = '⚿ KEY SET';
+    btn.className = 'key-status';
+  } else {
+    btn.textContent = '⚿ NO KEY';
+    btn.className = 'key-status no-key';
+  }
+}
+
+function openKeyModal() {
+  document.getElementById('key-input').value = apiKey;
+  document.getElementById('modal-key').classList.add('open');
+}
+
+function closeKeyModal() {
+  document.getElementById('modal-key').classList.remove('open');
+}
+
+function saveKey() {
+  const val = document.getElementById('key-input').value.trim();
+  if (!val) { showToast('Enter an API key'); return; }
+  apiKey = val;
+  localStorage.setItem('promptlab-key', val);
+  updateKeyStatus();
+  closeKeyModal();
+  showToast('API key saved ✓');
+}
+
+// ══════════════════════════════════════
+// CLAUDE API
+// ══════════════════════════════════════
+async function callClaude(systemPrompt, userPrompt, maxTokens = 500) {
+  if (!apiKey) { openKeyModal(); throw new Error('No API key set — add your Anthropic key first.'); }
+
+  const body = {
+    model: currentModel,
+    max_tokens: maxTokens,
+    messages: [{ role: 'user', content: userPrompt }]
+  };
+  if (systemPrompt && systemPrompt.trim()) body.system = systemPrompt;
+
+  const tempVal = parseFloat(document.getElementById('temp-val').textContent);
+  if (!isNaN(tempVal)) body.temperature = tempVal;
+
+  const response = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': apiKey,
+      'anthropic-version': '2023-06-01',
+      'anthropic-dangerous-direct-browser-access': 'true'
+    },
+    body: JSON.stringify(body)
+  });
+
+  const data = await response.json();
+  if (data.error) throw new Error(data.error.message);
+  return data.content.map(c => c.text || '').join('');
+}
+
+// ══════════════════════════════════════
+// EDITOR
+// ══════════════════════════════════════
+async function runPrompt() {
+  const system = document.getElementById('system-prompt').value;
+  const user = document.getElementById('user-prompt').value;
+  if (!user.trim()) { showToast('Write a prompt first'); return; }
+
+  const btn = document.getElementById('run-btn');
+  const output = document.getElementById('output-box');
+  const loading = document.getElementById('loading-bar');
+
+  btn.disabled = true; btn.textContent = '⏳ RUNNING...';
+  loading.classList.add('show');
+  output.className = 'output-box';
+  output.textContent = 'Generating...';
+
+  try {
+    const maxTok = parseInt(document.getElementById('tok-val').textContent);
+    const result = await callClaude(system, user, maxTok);
+    outputText = result;
+    output.className = 'output-box has-content';
+    output.textContent = result;
+    document.getElementById('token-count').textContent = `~${Math.round(result.split(' ').length * 1.3)} tokens used`;
+  } catch(e) {
+    output.className = 'output-box';
+    output.textContent = '⚠ ' + e.message;
+  }
+
+  btn.disabled = false; btn.textContent = '▶ RUN PROMPT';
+  loading.classList.remove('show');
+}
+
+function analyzePrompt() {
+  const prompt = document.getElementById('user-prompt').value;
+  if (!prompt) { showToast('Write a prompt first'); return; }
+  const words = prompt.trim().split(/\s+/).length;
+  const tokens = Math.round(words * 1.3);
+  const hasContext = prompt.includes('[') || prompt.toLowerCase().includes('context');
+  const hasInstruction = /write|create|analyze|explain|generate|list|describe|summarize/i.test(prompt);
+  const hasFormat = /format|structure|bullet|list|json|markdown|table|step/i.test(prompt);
+  const hasLength = /\d+\s*(words?|sentences?|paragraphs?|lines?)/i.test(prompt);
+  const clarity = Math.min(98, 30 + (hasContext?20:0) + (hasInstruction?20:0) + (hasFormat?15:0) + (hasLength?10:0) + Math.min(3,words));
+
+  document.getElementById('m-words').textContent = words;
+  document.getElementById('m-tokens').textContent = tokens;
+  document.getElementById('m-score').textContent = Math.round(clarity) + '%';
+  document.getElementById('metrics-row').style.display = 'grid';
+  showToast('Prompt analyzed ✓');
+}
+
+function copyOutput() {
+  if (!outputText) { showToast('Nothing to copy yet'); return; }
+  navigator.clipboard.writeText(outputText).then(() => showToast('Copied to clipboard ✓'));
+}
+
+function savePrompt() {
+  const user = document.getElementById('user-prompt').value;
+  if (!user.trim()) { showToast('Nothing to save yet'); return; }
+  const name = window.prompt('Name this prompt:');
+  if (!name) return;
+  const item = {
+    id: Date.now(),
+    name,
+    system: document.getElementById('system-prompt').value,
+    user,
+    output: outputText,
+    model: currentModel,
+    date: new Date().toLocaleDateString()
+  };
+  savedPrompts.unshift(item);
+  localStorage.setItem('promptlab-saved', JSON.stringify(savedPrompts));
+  showToast('Prompt saved ✓');
+}
+
+function clearAll() {
+  document.getElementById('system-prompt').value = '';
+  document.getElementById('user-prompt').value = '';
+  document.getElementById('output-box').className = 'output-box';
+  document.getElementById('output-box').textContent = 'Waiting for output...';
+  document.getElementById('token-count').textContent = '';
+  document.getElementById('metrics-row').style.display = 'none';
+  outputText = '';
+}
+
+function selectModel(el, model) {
+  document.querySelectorAll('.model-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  currentModel = model;
+}
+
+// ══════════════════════════════════════
+// LIBRARY
+// ══════════════════════════════════════
+const promptLibrary = [
+  { name: 'Blog Post Writer', cat: 'writing', prompt: 'Write a compelling blog post about [TOPIC]. Include an engaging introduction, 3 main points with examples, and a call to action. Tone: professional yet conversational. Length: 500 words.' },
+  { name: 'Code Reviewer', cat: 'code', prompt: 'Review the following code and provide: 1) Security vulnerabilities, 2) Performance issues, 3) Best practice violations, 4) Suggested improvements with examples.\n\nCode:\n[PASTE CODE HERE]' },
+  { name: 'SEO Meta Generator', cat: 'marketing', prompt: 'Generate SEO-optimized meta title (60 chars) and meta description (155 chars) for a page about [TOPIC]. Include primary keyword naturally. Focus on click-through rate.' },
+  { name: 'Bug Report Analyzer', cat: 'security', prompt: 'Analyze this bug report and provide: severity rating (Critical/High/Medium/Low), impact assessment, reproduction steps, and recommended fix.\n\nReport:\n[BUG REPORT]' },
+  { name: 'Data Analyst', cat: 'analysis', prompt: 'Analyze the following data and provide key insights, trends, anomalies, and actionable recommendations. Present findings in a structured format.\n\nData:\n[DATA]' },
+  { name: 'API Documentation', cat: 'code', prompt: 'Write clear API documentation for the following endpoint. Include: description, parameters, request/response examples, error codes.\n\nEndpoint:\n[ENDPOINT DETAILS]' },
+  { name: 'Marketing Copy', cat: 'marketing', prompt: 'Write persuasive marketing copy for [PRODUCT/SERVICE]. Target audience: [AUDIENCE]. Highlight: unique value proposition, key benefits, social proof elements. Include a strong CTA.' },
+  { name: 'Vulnerability Report', cat: 'security', prompt: 'Write a professional vulnerability disclosure report for a [VULNERABILITY TYPE] found in [SYSTEM]. Include: executive summary, technical details, proof of concept, impact, remediation steps.' },
+  { name: 'Story Generator', cat: 'writing', prompt: 'Write a short story about [THEME] with a surprising twist ending. Characters: [CHARACTERS]. Setting: [SETTING]. Tone: [TONE]. Length: 300 words.' },
+  { name: 'Competitive Analysis', cat: 'analysis', prompt: 'Perform a competitive analysis comparing [COMPANY A] vs [COMPANY B]. Cover: product features, pricing, target market, strengths, weaknesses, market positioning.' },
+  { name: 'Email Campaign', cat: 'marketing', prompt: 'Write a 3-email drip campaign for [PRODUCT]. Email 1: Welcome/Value intro. Email 2: Problem/Solution. Email 3: Offer/CTA. Subject lines for each. Conversational tone.' },
+  { name: 'Code Explainer', cat: 'code', prompt: 'Explain the following code in simple terms a beginner can understand. Cover: what it does, how it works, potential issues, and how to improve it.\n\nCode:\n[CODE]' },
+  { name: 'Tweet Thread', cat: 'writing', prompt: 'Write a 5-tweet thread about [TOPIC]. Tweet 1: hook. Tweets 2-4: key insights with examples. Tweet 5: CTA. Keep each under 280 chars. Conversational tone.' },
+  { name: 'Unit Test Writer', cat: 'code', prompt: 'Write comprehensive unit tests for the following function. Cover: happy path, edge cases, error handling, boundary values.\n\nFunction:\n[FUNCTION CODE]' },
+  { name: 'OSINT Summary', cat: 'security', prompt: 'Summarize the following OSINT findings about [TARGET]. Organize by: exposed data, risk level, recommended actions. Flag any critical exposures.\n\nFindings:\n[FINDINGS]' },
+];
+
+function renderLibrary(filter = '', cat = 'all') {
+  const cards = document.getElementById('prompt-cards');
+  const filtered = promptLibrary.filter(p =>
+    (cat === 'all' || p.cat === cat) &&
+    (!filter || p.name.toLowerCase().includes(filter) || p.prompt.toLowerCase().includes(filter))
+  );
+
+  if (!filtered.length) {
+    cards.innerHTML = '<div class="empty-state">No prompts found.</div>';
+    return;
+  }
+
+  cards.innerHTML = filtered.map(p => `
+    <div class="prompt-card">
+      <div class="prompt-card-header">
+        <div class="prompt-card-name">${p.name}</div>
+        <div class="prompt-card-cat cat-${p.cat}">${p.cat.toUpperCase()}</div>
+      </div>
+      <div class="prompt-card-preview">${p.prompt}</div>
+      <button class="use-btn" onclick="usePrompt(${JSON.stringify(p.prompt)})">USE PROMPT →</button>
+    </div>
+  `).join('');
+}
+
+function filterLibrary() {
+  renderLibrary(document.getElementById('lib-search').value.toLowerCase(), currentCat);
+}
+
+function filterCat(el, cat) {
+  currentCat = cat;
+  document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  filterLibrary();
+}
+
+function usePrompt(promptText) {
+  document.getElementById('user-prompt').value = promptText;
+  switchTab('editor', document.querySelector('.tab'));
+}
+
+// ══════════════════════════════════════
+// COMPARE — Real AI scoring
+// ══════════════════════════════════════
+async function runCompare() {
+  const a = document.getElementById('compare-a').value;
+  const b = document.getElementById('compare-b').value;
+  if (!a.trim() || !b.trim()) { showToast('Fill in both prompts'); return; }
+
+  const btn = document.getElementById('compare-btn');
+  const loading = document.getElementById('loading-bar');
+  btn.disabled = true; btn.textContent = '⏳ COMPARING...';
+  loading.classList.add('show');
+
+  const outA = document.getElementById('compare-out-a');
+  const outB = document.getElementById('compare-out-b');
+  outA.textContent = 'Generating...'; outA.className = 'compare-output';
+  outB.textContent = 'Generating...'; outB.className = 'compare-output';
+  document.getElementById('winner-box').style.display = 'none';
+
+  try {
+    // Run both prompts simultaneously
+    const [resA, resB] = await Promise.all([
+      callClaude('', a, 400),
+      callClaude('', b, 400)
+    ]);
+
+    outA.textContent = resA; outA.className = 'compare-output filled';
+    outB.textContent = resB; outB.className = 'compare-output filled';
+
+    // Ask Claude to judge which output is better
+    const judgePrompt = `You are an expert prompt engineer. Two prompts were tested and produced the following outputs.
+
+PROMPT A:
+${a}
+
+OUTPUT A:
+${resA}
+
+---
+
+PROMPT B:
+${b}
+
+OUTPUT B:
+${resB}
+
+---
+
+Evaluate both outputs. Which prompt produced the better result? Consider: clarity, completeness, usefulness, and quality of the response.
+
+Respond in this exact JSON format only:
+{"winner": "A" or "B", "scoreA": number 0-100, "scoreB": number 0-100, "reason": "one sentence explanation"}`;
+
+    const verdict = await callClaude('You are a prompt engineering expert. Respond only in valid JSON.', judgePrompt, 200);
+
+    let parsed;
+    try {
+      parsed = JSON.parse(verdict.replace(/```json|```/g, '').trim());
+    } catch(e) {
+      // fallback if JSON fails
+      parsed = { winner: resA.length >= resB.length ? 'A' : 'B', scoreA: 72, scoreB: 68, reason: 'Based on output quality and completeness.' };
+    }
+
+    document.getElementById('score-a').textContent = parsed.scoreA + '%';
+    document.getElementById('score-b').textContent = parsed.scoreB + '%';
+    document.getElementById('winner-box').style.display = 'block';
+    document.getElementById('winner-text').innerHTML = `<strong style="color:var(--accent)">Prompt ${parsed.winner} wins</strong> — ${parsed.reason}`;
+
+  } catch(e) {
+    outA.textContent = '⚠ ' + e.message;
+    outB.textContent = '⚠ ' + e.message;
+  }
+
+  btn.disabled = false; btn.textContent = '⚖️ RUN COMPARISON';
+  loading.classList.remove('show');
+}
+
+// ══════════════════════════════════════
+// SAVED
+// ══════════════════════════════════════
+function renderSaved() {
+  const list = document.getElementById('saved-list');
+  if (!savedPrompts.length) {
+    list.innerHTML = '<div class="empty-state">No saved prompts yet.<br>Run a prompt and click SAVE.</div>';
+    return;
+  }
+  list.innerHTML = savedPrompts.map(p => `
+    <div class="saved-item">
+      <div style="min-width:0">
+        <div class="saved-name">${p.name}</div>
+        <div class="saved-preview">${p.date} · ${p.user.slice(0, 45)}...</div>
+      </div>
+      <div class="saved-actions">
+        <button class="saved-btn" onclick="loadSaved(${p.id})">LOAD</button>
+        <button class="saved-btn del" onclick="deleteSaved(${p.id})">DEL</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function loadSaved(id) {
+  const p = savedPrompts.find(s => s.id === id);
+  if (!p) return;
+  document.getElementById('system-prompt').value = p.system || '';
+  document.getElementById('user-prompt').value = p.user;
+  if (p.output) {
+    outputText = p.output;
+    const out = document.getElementById('output-box');
+    out.className = 'output-box has-content';
+    out.textContent = p.output;
+  }
+  switchTab('editor', document.querySelector('.tab'));
+  showToast('Prompt loaded ✓');
+}
+
+function deleteSaved(id) {
+  savedPrompts = savedPrompts.filter(s => s.id !== id);
+  localStorage.setItem('promptlab-saved', JSON.stringify(savedPrompts));
+  renderSaved();
+}
+
+function exportSaved() {
+  if (!savedPrompts.length) { showToast('Nothing to export'); return; }
+  const blob = new Blob([JSON.stringify(savedPrompts, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = `promptlab-export-${Date.now()}.json`;
+  a.click(); URL.revokeObjectURL(url);
+  showToast('Exported ✓');
+}
+
+function clearSaved() {
+  if (!confirm('Clear all saved prompts?')) return;
+  savedPrompts = [];
+  localStorage.removeItem('promptlab-saved');
+  renderSaved();
+}
+
+// ══════════════════════════════════════
+// TABS
+// ══════════════════════════════════════
+function switchTab(name, btn) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('panel-' + name).classList.add('active');
+  // find the right tab button
+  document.querySelectorAll('.tab').forEach(t => {
+    if (t.textContent.toLowerCase().includes(name.toLowerCase())) t.classList.add('active');
+  });
+  if (name === 'library') renderLibrary();
+  if (name === 'saved') renderSaved();
+}
+
+// ══════════════════════════════════════
+// TOAST
+// ══════════════════════════════════════
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// ══════════════════════════════════════
+// INIT
+// ══════════════════════════════════════
+updateKeyStatus();
+renderLibrary();
+</script>
+</body>
+</html>

@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PromptLab — AI Prompt Engineering Workspace</title>
+<meta name="description" content="Test, compare and save AI prompts. Bring your own Anthropic key. No accounts. No servers. Just pure prompt engineering.">
+<meta name="theme-color" content="#0c0c0e">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;700&family=Unbounded:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0c0c0e;
+    --surface: #111114;
+    --card: #16161a;
+    --border: rgba(255,255,255,0.07);
+    --accent: #e8ff47;
+    --accent-dim: rgba(232,255,71,0.15);
+    --blue: #47b4ff;
+    --pink: #ff47a8;
+    --green: #47ffb4;
+    --text: #f0f0f0;
+    --dim: rgba(240,240,240,0.4);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'JetBrains Mono', monospace;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* BG */
+  .bg-glow {
+    position: fixed; inset: 0; pointer-events: none; z-index: 0;
+    background:
+      radial-gradient(ellipse 60% 40% at 50% 0%, rgba(232,255,71,0.07) 0%, transparent 60%),
+      radial-gradient(ellipse 40% 30% at 80% 80%, rgba(71,180,255,0.05) 0%, transparent 50%);
+  }
+
+  /* NAV */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 5%; height: 60px;
+    background: rgba(12,12,14,0.85); backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .nav-logo {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 14px; font-weight: 900;
+    color: var(--accent); letter-spacing: 2px;
+    text-shadow: 0 0 20px rgba(232,255,71,0.4);
+  }
+
+  .nav-logo span { color: var(--dim); font-weight: 400; }
+
+  .nav-badge {
+    font-size: 9px; letter-spacing: 2px; color: var(--green);
+    border: 1px solid rgba(71,255,180,0.3); padding: 4px 10px;
+    border-radius: 20px; background: rgba(71,255,180,0.05);
+  }
+
+  .nav-cta {
+    padding: 8px 18px;
+    background: var(--accent); border: none; border-radius: 4px;
+    color: #000; font-family: 'Unbounded', sans-serif;
+    font-size: 10px; font-weight: 700; letter-spacing: 2px;
+    cursor: pointer; text-decoration: none;
+    transition: all 0.2s;
+  }
+  .nav-cta:hover { box-shadow: 0 4px 20px rgba(232,255,71,0.4); transform: translateY(-1px); }
+
+  /* SECTIONS */
+  section { position: relative; z-index: 1; }
+
+  /* HERO */
+  .hero {
+    min-height: 100vh; display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding: 100px 5% 60px; text-align: center;
+  }
+
+  .hero-tag {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 10px; letter-spacing: 3px; color: var(--accent);
+    border: 1px solid var(--accent-dim); padding: 6px 16px;
+    border-radius: 20px; background: rgba(232,255,71,0.05);
+    margin-bottom: 32px;
+    animation: fadeUp 0.8s ease both;
+  }
+
+  .hero-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--accent); box-shadow: 0 0 8px var(--accent);
+    animation: blink 1.4s step-end infinite;
+  }
+  @keyframes blink { 50% { opacity: 0; } }
+
+  .hero-title {
+    font-family: 'Unbounded', sans-serif;
+    font-size: clamp(38px, 9vw, 88px);
+    font-weight: 900; line-height: 1.0;
+    letter-spacing: -0.02em; margin-bottom: 24px;
+    animation: fadeUp 0.8s 0.1s ease both;
+  }
+
+  .hero-title .accent {
+    color: var(--accent);
+    text-shadow: 0 0 40px rgba(232,255,71,0.3);
+  }
+
+  .hero-sub {
+    font-size: clamp(13px, 2vw, 16px);
+    color: var(--dim); max-width: 500px;
+    line-height: 1.8; margin-bottom: 40px;
+    animation: fadeUp 0.8s 0.2s ease both;
+  }
+
+  .hero-actions {
+    display: flex; gap: 12px; flex-wrap: wrap;
+    justify-content: center;
+    animation: fadeUp 0.8s 0.3s ease both;
+  }
+
+  .btn-primary {
+    padding: 16px 36px;
+    background: var(--accent); border: none; border-radius: 4px;
+    color: #000; font-family: 'Unbounded', sans-serif;
+    font-size: 12px; font-weight: 700; letter-spacing: 3px;
+    cursor: pointer; text-decoration: none;
+    transition: all 0.2s; display: inline-block;
+  }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(232,255,71,0.4); }
+
+  .btn-secondary {
+    padding: 16px 36px;
+    background: transparent; border: 1px solid var(--border);
+    border-radius: 4px; color: var(--text);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; letter-spacing: 2px;
+    cursor: pointer; text-decoration: none;
+    transition: all 0.2s; display: inline-block;
+  }
+  .btn-secondary:hover { border-color: var(--accent-dim); color: var(--accent); }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* FEATURES */
+  .features {
+    padding: 80px 5%;
+    border-top: 1px solid var(--border);
+  }
+
+  .features-label {
+    text-align: center;
+    font-size: 10px; letter-spacing: 4px; color: var(--dim);
+    margin-bottom: 48px;
+  }
+
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 16px; max-width: 900px; margin: 0 auto;
+  }
+
+  .feature-card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 6px; padding: 24px;
+    transition: border-color 0.2s;
+  }
+  .feature-card:hover { border-color: var(--accent-dim); }
+
+  .feature-icon {
+    font-size: 24px; margin-bottom: 14px;
+  }
+
+  .feature-title {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 12px; font-weight: 700;
+    color: var(--accent); letter-spacing: 1px;
+    margin-bottom: 8px;
+  }
+
+  .feature-desc {
+    font-size: 12px; color: var(--dim);
+    line-height: 1.7;
+  }
+
+  /* BYOK SECTION */
+  .byok {
+    padding: 80px 5%;
+    border-top: 1px solid var(--border);
+    text-align: center;
+  }
+
+  .byok-inner {
+    max-width: 600px; margin: 0 auto;
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 8px; padding: 40px 32px;
+  }
+
+  .byok-title {
+    font-family: 'Unbounded', sans-serif;
+    font-size: clamp(18px, 4vw, 28px);
+    font-weight: 900; color: var(--text);
+    margin-bottom: 16px; letter-spacing: 1px;
+  }
+
+  .byok-title span { color: var(--accent); }
+
+  .byok-desc {
+    font-size: 12px; color: var(--dim);
+    line-height: 1.8; margin-bottom: 28px;
+  }
+
+  .byok-flow {
+    display: flex; align-items: center;
+    justify-content: center; gap: 8px;
+    flex-wrap: wrap; margin-bottom: 28px;
+  }
+
+  .flow-step {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 4px; padding: 8px 14px;
+    font-size: 10px; letter-spacing: 1px; color: var(--text);
+  }
+
+  .flow-arrow { color: var(--accent); font-size: 14px; }
+
+  /* STATS */
+  .stats {
+    padding: 60px 5%;
+    border-top: 1px solid var(--border);
+  }
+
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1px; max-width: 700px; margin: 0 auto;
+    background: var(--border); border: 1px solid var(--border);
+    border-radius: 6px; overflow: hidden;
+  }
+
+  .stat-item {
+    background: var(--card); padding: 28px 20px;
+    text-align: center;
+  }
+
+  .stat-num {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 28px; font-weight: 900;
+    color: var(--accent); display: block; margin-bottom: 6px;
+  }
+
+  .stat-label {
+    font-size: 9px; letter-spacing: 2px; color: var(--dim);
+  }
+
+  /* FOOTER */
+  footer {
+    padding: 32px 5%;
+    border-top: 1px solid var(--border);
+    display: flex; align-items: center;
+    justify-content: space-between; flex-wrap: wrap; gap: 12px;
+  }
+
+  .footer-logo {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 11px; color: var(--accent); letter-spacing: 2px;
+  }
+
+  .footer-links {
+    display: flex; gap: 20px;
+    font-size: 10px; letter-spacing: 1px; color: var(--dim);
+  }
+
+  .footer-copy {
+    font-size: 9px; color: var(--dim); letter-spacing: 1px;
+  }
+
+  /* MOBILE */
+  @media (max-width: 600px) {
+    .nav-badge { display: none; }
+    .byok-inner { padding: 24px 18px; }
+    footer { flex-direction: column; text-align: center; }
+  }
+</style>
+</head>
+<body>
+
+<div class="bg-glow"></div>
+
+<nav>
+  <div class="nav-logo">PROMPT<span>LAB</span></div>
+  <div class="nav-badge">● BYOK — ZERO SERVER</div>
+  <a href="app.html" class="nav-cta">LAUNCH APP</a>
+</nav>
+
+<section class="hero">
+  <div class="hero-tag">
+    <div class="hero-dot"></div>
+    AI PROMPT ENGINEERING WORKSPACE
+  </div>
+  <h1 class="hero-title">
+    Engineer<br>
+    Better <span class="accent">Prompts.</span>
+  </h1>
+  <p class="hero-sub">
+    Write, test, compare and save AI prompts with real Claude output.
+    Bring your own API key — we store nothing, send nothing, charge nothing.
+  </p>
+  <div class="hero-actions">
+    <a href="app.html" class="btn-primary">▶ LAUNCH APP</a>
+    <a href="#features" class="btn-secondary">SEE FEATURES</a>
+  </div>
+</section>
+
+<section class="features" id="features">
+  <div class="features-label">// WHAT YOU GET</div>
+  <div class="features-grid">
+    <div class="feature-card">
+      <div class="feature-icon">⚡</div>
+      <div class="feature-title">PROMPT EDITOR</div>
+      <div class="feature-desc">Write system + user prompts, pick your model, tune max tokens. Run against real Claude and see output instantly.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">⚖️</div>
+      <div class="feature-title">COMPARE MODE</div>
+      <div class="feature-desc">Run two prompt variations simultaneously. Claude judges which output is better — real AI scoring, not random numbers.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">📚</div>
+      <div class="feature-title">PROMPT LIBRARY</div>
+      <div class="feature-desc">12 battle-tested templates across writing, code, marketing, security and analysis. One click to load and customize.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">💾</div>
+      <div class="feature-title">SAVE & RESTORE</div>
+      <div class="feature-desc">Save your best prompts locally. Load them back anytime. Export to JSON. Your prompts stay yours — no account needed.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">📊</div>
+      <div class="feature-title">PROMPT ANALYZER</div>
+      <div class="feature-desc">Instant feedback on clarity score, token count and word count. Know if your prompt is structured for success before you run it.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🔑</div>
+      <div class="feature-title">BYOK — YOUR KEY</div>
+      <div class="feature-desc">Paste your Anthropic key once. It stays in your browser. We never see it, never store it, never touch your usage.</div>
+    </div>
+  </div>
+</section>
+
+<section class="byok">
+  <div class="byok-inner">
+    <div class="byok-title">Bring Your Own <span>Key</span></div>
+    <p class="byok-desc">
+      PromptLab calls Claude directly from your browser using your Anthropic API key.
+      Zero middlemen. Zero markup. You pay Anthropic's standard rates — nothing extra.
+    </p>
+    <div class="byok-flow">
+      <div class="flow-step">Your API Key</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">Your Browser</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">Anthropic API</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">Real Output</div>
+    </div>
+    <a href="app.html" class="btn-primary">GET STARTED FREE</a>
+  </div>
+</section>
+
+<section class="stats">
+  <div class="stats-grid">
+    <div class="stat-item">
+      <span class="stat-num">12</span>
+      <span class="stat-label">PROMPT TEMPLATES</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-num">2</span>
+      <span class="stat-label">CLAUDE MODELS</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-num">0</span>
+      <span class="stat-label">SERVERS / ACCOUNTS</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-num">∞</span>
+      <span class="stat-label">SAVED PROMPTS</span>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-logo">PROMPTLAB</div>
+  <div class="footer-links">
+    <span>By GenesisVault</span>
+    <a href="app.html" style="color:var(--accent);text-decoration:none">Launch App →</a>
+  </div>
+  <div class="footer-copy">© 2025 GENESISVAULT.XYZ</div>
+</footer>
+
+</body>
+</html>
