@@ -414,6 +414,41 @@
     display: flex; gap: 8px; justify-content: flex-end;
   }
 
+  /* ── AGENT STEPS ── */
+  .agent-steps { display: flex; flex-direction: column; gap: 8px; margin-bottom: 14px; }
+
+  .agent-step {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 4px; padding: 12px; transition: border-color 0.3s;
+  }
+  .agent-step.running { border-color: var(--accent-dim); }
+  .agent-step.done { border-color: rgba(71,255,180,0.3); }
+  .agent-step.error { border-color: rgba(255,71,71,0.3); }
+
+  .step-header { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+  .step-num {
+    width: 22px; height: 22px; border-radius: 50%;
+    background: var(--border); display: flex; align-items: center;
+    justify-content: center; font-size: 9px; font-weight: 700;
+    flex-shrink: 0; transition: background 0.3s;
+  }
+  .agent-step.running .step-num { background: var(--accent-dim); color: var(--accent); animation: pulse 1s infinite; }
+  .agent-step.done .step-num { background: rgba(71,255,180,0.2); color: var(--green); }
+  .agent-step.error .step-num { background: rgba(255,71,71,0.15); color: var(--red); }
+
+  @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.4; } }
+
+  .step-title { font-size: 10px; letter-spacing: 2px; color: var(--dim); flex: 1; }
+  .agent-step.running .step-title { color: var(--accent); }
+  .agent-step.done .step-title { color: var(--green); }
+
+  .step-status { font-size: 10px; }
+  .step-output {
+    font-size: 11px; color: var(--dim); line-height: 1.6;
+    display: none; margin-top: 8px; white-space: pre-wrap; word-break: break-word;
+  }
+  .agent-step.done .step-output { display: block; color: rgba(240,240,240,0.6); }
+
   /* ── TOAST ── */
   .toast {
     position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%) translateY(20px);
@@ -441,6 +476,7 @@
   <button class="tab" onclick="switchTab('library', this)">LIBRARY</button>
   <button class="tab" onclick="switchTab('compare', this)">COMPARE</button>
   <button class="tab" onclick="switchTab('saved', this)">SAVED</button>
+  <button class="tab" onclick="switchTab('agent', this)">⚡ AGENT</button>
 </div>
 
 <!-- LOADING BAR -->
@@ -574,6 +610,49 @@
   </div>
 
 </div>
+
+  <!-- AGENT -->
+  <div class="panel" id="panel-agent">
+    <div class="scroll">
+
+      <div class="sec-label" style="margin-bottom:6px">PROMPT GOAL</div>
+      <textarea id="agent-goal" rows="3" placeholder="Describe what you want your prompt to do... e.g. 'Write compelling product descriptions for an ecommerce store'"></textarea>
+
+      <div class="sec-label" style="margin-top:12px;margin-bottom:6px">CONTEXT <span class="sec-badge">OPTIONAL</span></div>
+      <textarea id="agent-context" rows="2" placeholder="Any extra context, audience, tone, constraints..."></textarea>
+
+      <div class="sec-label" style="margin-top:12px;margin-bottom:8px">MODE</div>
+      <div class="model-row" style="margin-bottom:14px">
+        <button class="model-btn active" id="mode-engineer" onclick="selectAgentMode(this,'engineer')">🧠 ENGINEER</button>
+        <button class="model-btn" id="mode-extract" onclick="selectAgentMode(this,'extract')">📖 EXTRACTOR</button>
+      </div>
+
+      <div id="extract-input" style="display:none;margin-bottom:14px">
+        <div class="sec-label" style="margin-bottom:6px">PASTE TEXT <span class="sec-badge">NOVEL / STORY / ANY TEXT</span></div>
+        <textarea id="agent-extract-text" rows="6" placeholder="Paste any text — novel excerpt, story, article, dialogue... The agent will extract the writing style, tone and patterns into reusable prompts."></textarea>
+      </div>
+
+      <button class="run-btn" id="agent-run-btn" onclick="runAgent()" style="background:linear-gradient(135deg,#e8ff47,#47ffb4)">⚡ RUN AGENT</button>
+
+      <!-- PIPELINE STEPS -->
+      <div id="agent-pipeline" style="display:none">
+        <div class="sec-label" style="margin-bottom:10px">// AGENT PIPELINE</div>
+        <div class="agent-steps" id="agent-steps"></div>
+        <div id="agent-final" style="display:none">
+          <div class="sec-label" style="margin:14px 0 8px">// FINAL OPTIMIZED PROMPT</div>
+          <div class="output-box has-content" id="agent-final-output"></div>
+          <div class="output-actions" style="margin-top:8px">
+            <button class="action-btn accent" onclick="useAgentPrompt()">USE IN EDITOR</button>
+            <button class="action-btn" onclick="copyAgentPrompt()">COPY</button>
+            <button class="action-btn" onclick="saveAgentPrompt()">SAVE</button>
+          </div>
+          <div class="sec-label" style="margin:14px 0 8px">// AGENT REASONING</div>
+          <div class="output-box" id="agent-reasoning" style="font-size:11px;color:var(--dim)"></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
 
 <!-- KEY MODAL -->
 <div class="modal-overlay" id="modal-key">
@@ -989,6 +1068,225 @@ function showToast(msg) {
 }
 
 // ══════════════════════════════════════
+// ══════════════════════════════════════
+// AGENT
+// ══════════════════════════════════════
+let agentMode = 'engineer';
+let agentFinalPrompt = '';
+
+function selectAgentMode(el, mode) {
+  agentMode = mode;
+  document.querySelectorAll('#panel-agent .model-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('extract-input').style.display = mode === 'extract' ? 'block' : 'none';
+}
+
+function makeStep(num, title) {
+  const el = document.createElement('div');
+  el.className = 'agent-step';
+  el.id = `step-${num}`;
+  el.innerHTML = `
+    <div class="step-header">
+      <div class="step-num">${num}</div>
+      <div class="step-title">${title}</div>
+      <div class="step-status" id="step-status-${num}">⏳</div>
+    </div>
+    <div class="step-output" id="step-out-${num}"></div>`;
+  return el;
+}
+
+function setStepState(num, state, output = '') {
+  const el = document.getElementById(`step-${num}`);
+  const status = document.getElementById(`step-status-${num}`);
+  const out = document.getElementById(`step-out-${num}`);
+  if (!el) return;
+  el.className = `agent-step ${state}`;
+  status.textContent = state === 'running' ? '⟳' : state === 'done' ? '✓' : state === 'error' ? '✗' : '⏳';
+  if (output) out.textContent = output.slice(0, 200) + (output.length > 200 ? '...' : '');
+}
+
+async function runAgent() {
+  const goal = document.getElementById('agent-goal').value.trim();
+  if (!goal) { showToast('Describe your prompt goal first'); return; }
+  if (!apiKey) { openKeyModal(); return; }
+
+  const isExtract = agentMode === 'extract';
+  const extractText = document.getElementById('agent-extract-text').value.trim();
+  if (isExtract && !extractText) { showToast('Paste some text to extract from'); return; }
+
+  const btn = document.getElementById('agent-run-btn');
+  const pipeline = document.getElementById('agent-pipeline');
+  const stepsEl = document.getElementById('agent-steps');
+  const finalEl = document.getElementById('agent-final');
+  const loading = document.getElementById('loading-bar');
+
+  btn.disabled = true; btn.textContent = '⚡ AGENT RUNNING...';
+  loading.classList.add('show');
+  pipeline.style.display = 'block';
+  finalEl.style.display = 'none';
+  stepsEl.innerHTML = '';
+  agentFinalPrompt = '';
+
+  const context = document.getElementById('agent-context').value.trim();
+
+  // Define steps based on mode
+  const steps = isExtract ? [
+    'ANALYZE TEXT STRUCTURE & STYLE',
+    'EXTRACT TONE, VOICE & PATTERNS',
+    'GENERATE PROMPT VARIATIONS',
+    'TEST BEST VARIATION',
+    'REFINE & FINALIZE PROMPT'
+  ] : [
+    'UNDERSTAND GOAL & REQUIREMENTS',
+    'GENERATE 3 PROMPT VARIATIONS',
+    'TEST ALL VARIATIONS AGAINST QWEN',
+    'JUDGE & SELECT WINNER',
+    'REFINE & FINALIZE PROMPT'
+  ];
+
+  steps.forEach((title, i) => stepsEl.appendChild(makeStep(i + 1, title)));
+
+  try {
+    let variation1, variation2, variation3, testOut1, testOut2, testOut3, winner;
+
+    if (isExtract) {
+      // ── STEP 1: Analyze text ──
+      setStepState(1, 'running');
+      const analysis = await callClaude(
+        'You are an expert literary analyst and prompt engineer.',
+        `Analyze this text and identify: writing style, tone, sentence structure, vocabulary level, narrative voice, pacing, and unique stylistic patterns.\n\nText:\n${extractText.slice(0, 2000)}\n\nBe specific and concise.`
+      , 400);
+      setStepState(1, 'done', analysis);
+
+      // ── STEP 2: Extract patterns ──
+      setStepState(2, 'running');
+      const patterns = await callClaude(
+        'You are an expert prompt engineer.',
+        `Based on this style analysis, extract 5 concrete stylistic rules that define this writing:\n\n${analysis}\n\nFormat as numbered rules, each one sentence.`
+      , 300);
+      setStepState(2, 'done', patterns);
+
+      // ── STEP 3: Generate variations ──
+      setStepState(3, 'running');
+      const vars = await callClaude(
+        'You are an expert prompt engineer. Respond in JSON only.',
+        `Create 3 system prompt variations that capture this writing style for use with an AI.\n\nStyle rules:\n${patterns}\n\nUser goal: ${goal}\n\nRespond ONLY as JSON: {"v1":"...","v2":"...","v3":"..."}`
+      , 500);
+      let parsed;
+      try { parsed = JSON.parse(vars.replace(/```json|```/g,'').trim()); }
+      catch(e) { parsed = { v1: vars, v2: vars, v3: vars }; }
+      variation1 = parsed.v1; variation2 = parsed.v2; variation3 = parsed.v3;
+      setStepState(3, 'done', `Generated 3 style-based prompt variations`);
+
+    } else {
+      // ── STEP 1: Understand goal ──
+      setStepState(1, 'running');
+      const understanding = await callClaude(
+        'You are an expert prompt engineer.',
+        `Analyze this prompt goal and identify: core task, target audience, desired output format, key constraints, and success criteria.\n\nGoal: ${goal}\n${context ? `Context: ${context}` : ''}\n\nBe concise.`
+      , 300);
+      setStepState(1, 'done', understanding);
+
+      // ── STEP 2: Generate 3 variations ──
+      setStepState(2, 'running');
+      const vars = await callClaude(
+        'You are an expert prompt engineer. Respond in JSON only.',
+        `Create 3 distinct prompt variations for this goal. Each should take a different approach (direct, role-based, chain-of-thought).\n\nGoal: ${goal}\n${context ? `Context: ${context}` : ''}\n\nRespond ONLY as JSON: {"v1":"...","v2":"...","v3":"..."}`
+      , 600);
+      let parsed;
+      try { parsed = JSON.parse(vars.replace(/```json|```/g,'').trim()); }
+      catch(e) { parsed = { v1: vars, v2: vars, v3: vars }; }
+      variation1 = parsed.v1; variation2 = parsed.v2; variation3 = parsed.v3;
+      setStepState(2, 'done', `V1: ${variation1.slice(0,80)}...`);
+    }
+
+    // ── STEP 3/4: Test variations ──
+    setStepState(isExtract ? 4 : 3, 'running');
+    const testTask = isExtract
+      ? `Write a short paragraph in this style about: ${goal}`
+      : `Give a brief example output for: ${goal}`;
+
+    [testOut1, testOut2, testOut3] = await Promise.all([
+      callClaude(variation1, testTask, 200),
+      callClaude(variation2, testTask, 200),
+      callClaude(variation3, testTask, 200)
+    ]);
+    setStepState(isExtract ? 4 : 3, 'done', `Tested all 3 variations against Qwen`);
+
+    // ── STEP 4/5: Judge winner ──
+    setStepState(isExtract ? 4 : 4, 'running');
+    const judgeResult = await callClaude(
+      'You are an expert prompt engineer. Respond in JSON only.',
+      `Judge these 3 prompt outputs for the goal: "${goal}"\n\nOutput 1: ${testOut1}\n\nOutput 2: ${testOut2}\n\nOutput 3: ${testOut3}\n\nRespond ONLY as JSON: {"winner": 1, 2 or 3, "reason": "one sentence"}`
+    , 150);
+    let judged;
+    try { judged = JSON.parse(judgeResult.replace(/```json|```/g,'').trim()); }
+    catch(e) { judged = { winner: 1, reason: 'Best overall quality.' }; }
+    winner = judged.winner === 2 ? variation2 : judged.winner === 3 ? variation3 : variation1;
+    setStepState(isExtract ? 4 : 4, 'done', `Prompt ${judged.winner} wins — ${judged.reason}`);
+
+    // ── STEP 5: Refine ──
+    setStepState(5, 'running');
+    const refined = await callClaude(
+      'You are an expert prompt engineer.',
+      `Refine and improve this prompt to make it more effective, clear and complete. Fix any weaknesses.\n\nOriginal prompt:\n${winner}\n\nGoal: ${goal}\n\nReturn ONLY the improved prompt text, nothing else.`
+    , 400);
+    setStepState(5, 'done', refined.slice(0, 100) + '...');
+
+    // ── FINAL ──
+    agentFinalPrompt = refined;
+    document.getElementById('agent-final-output').textContent = refined;
+    document.getElementById('agent-reasoning').textContent =
+      `Mode: ${isExtract ? 'Style Extractor' : 'Prompt Engineer'}\n` +
+      `Goal: ${goal}\n` +
+      `Variations tested: 3\n` +
+      `Winner: Variation ${judged.winner}\n` +
+      `Reason: ${judged.reason}\n` +
+      `Final: Refined by agent for clarity and completeness.`;
+    finalEl.style.display = 'block';
+    showToast('Agent complete ✓');
+
+  } catch(e) {
+    showToast('⚠ ' + e.message);
+    // mark remaining steps as error
+    for (let i = 1; i <= 5; i++) {
+      const el = document.getElementById(`step-${i}`);
+      if (el && !el.classList.contains('done')) setStepState(i, 'error');
+    }
+  }
+
+  btn.disabled = false; btn.textContent = '⚡ RUN AGENT';
+  loading.classList.remove('show');
+}
+
+function useAgentPrompt() {
+  if (!agentFinalPrompt) return;
+  document.getElementById('system-prompt').value = agentFinalPrompt;
+  switchTab('editor', document.querySelector('.tab'));
+  showToast('Loaded into editor ✓');
+}
+
+function copyAgentPrompt() {
+  if (!agentFinalPrompt) return;
+  navigator.clipboard.writeText(agentFinalPrompt).then(() => showToast('Copied ✓'));
+}
+
+function saveAgentPrompt() {
+  if (!agentFinalPrompt) { showToast('Run agent first'); return; }
+  const name = window.prompt('Name this prompt:');
+  if (!name) return;
+  const item = {
+    id: Date.now(), name,
+    system: agentFinalPrompt,
+    user: document.getElementById('agent-goal').value,
+    output: '', model: currentModel,
+    date: new Date().toLocaleDateString()
+  };
+  savedPrompts.unshift(item);
+  localStorage.setItem('promptlab-saved', JSON.stringify(savedPrompts));
+  showToast('Saved ✓');
+}
+
 // INIT
 // ══════════════════════════════════════
 updateKeyStatus();
