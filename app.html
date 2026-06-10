@@ -879,14 +879,16 @@ function renderLibrary(filter = '', cat = 'all') {
     return;
   }
 
-  cards.innerHTML = filtered.map(p => `
+  _lastFilteredLibrary = filtered;
+
+  cards.innerHTML = filtered.map((p, i) => `
     <div class="prompt-card">
       <div class="prompt-card-header">
         <div class="prompt-card-name">${p.name}</div>
         <div class="prompt-card-cat cat-${p.cat}">${p.cat.toUpperCase()}</div>
       </div>
       <div class="prompt-card-preview">${p.prompt}</div>
-      <button class="use-btn" onclick="usePrompt(${JSON.stringify(p.prompt)})">USE PROMPT →</button>
+      <button class="use-btn" onclick="usePromptByIndex(${i})">USE PROMPT →</button>
     </div>
   `).join('');
 }
@@ -902,9 +904,21 @@ function filterCat(el, cat) {
   filterLibrary();
 }
 
+// Store filtered results for index lookup
+let _lastFilteredLibrary = [];
+
+function usePromptByIndex(i) {
+  const prompt = _lastFilteredLibrary[i]?.prompt;
+  if (!prompt) return;
+  document.getElementById('user-prompt').value = prompt;
+  switchTab('editor', document.querySelector('.tab'));
+  showToast('Prompt loaded ✓');
+}
+
 function usePrompt(promptText) {
   document.getElementById('user-prompt').value = promptText;
   switchTab('editor', document.querySelector('.tab'));
+  showToast('Prompt loaded ✓');
 }
 
 // ══════════════════════════════════════
