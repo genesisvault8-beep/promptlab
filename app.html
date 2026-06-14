@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>PromptLab — Qwen Cloud Edition</title>
+<title>PromptLab — AI Prompt Engineering Workspace</title>
 <meta name="theme-color" content="#0c0c0e">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -501,9 +501,9 @@
 
       <div class="sec-label" style="margin-bottom:8px">MODEL</div>
       <div class="model-row">
-        <button class="model-btn active" onclick="selectModel(this,'qwen/qwen-plus')">Qwen Plus</button>
-        <button class="model-btn" onclick="selectModel(this,'qwen/qwen-turbo')">Qwen Turbo</button>
-        <button class="model-btn" onclick="selectModel(this,'qwen/qwen-max')">Qwen Max</button>
+        <button class="model-btn active" onclick="selectModel(this,'anthropic/claude-haiku-4-5')">Claude Haiku</button>
+        <button class="model-btn" onclick="selectModel(this,'openai/gpt-4o-mini')">GPT-4o Mini</button>
+        <button class="model-btn" onclick="selectModel(this,'google/gemini-flash-1.5')">Gemini Flash</button>
       </div>
 
       <div class="sec-label" style="margin-bottom:8px">PARAMETERS</div>
@@ -663,7 +663,7 @@
     </div>
     <div class="modal-body">
       <div class="modal-desc">
-        Enter your OpenRouter API key. Sign up free at openrouter.ai — gives you access to Qwen Plus, Turbo and Max. Key stays in your browser only.
+        Enter your OpenRouter API key. Sign up free at openrouter.ai — gives you access to Claude, GPT-4o, Gemini and 100+ models. Key stays in your browser only.
         <br><br>
         Get your key at <span style="color:var(--accent)">openrouter.ai/keys</span>
       </div>
@@ -683,7 +683,7 @@
 // ══════════════════════════════════════
 // STATE
 // ══════════════════════════════════════
-let currentModel = 'qwen/qwen-plus';
+let currentModel = 'anthropic/claude-haiku-4-5';
 let currentCat = 'all';
 let outputText = '';
 let savedPrompts = JSON.parse(localStorage.getItem('promptlab-saved') || '[]');
@@ -726,7 +726,7 @@ function saveKey() {
 // CLAUDE API
 // ══════════════════════════════════════
 async function callClaude(systemPrompt, userPrompt, maxTokens = 500) {
-  if (!apiKey) { openKeyModal(); throw new Error('No API key — add your Qwen Cloud API key first.'); }
+  if (!apiKey) { openKeyModal(); throw new Error('No API key — add your OpenRouter API key first.'); }
 
   const body = {
     model: currentModel,
@@ -1155,7 +1155,7 @@ async function runAgent() {
   ] : [
     'UNDERSTAND GOAL & REQUIREMENTS',
     'GENERATE 3 PROMPT VARIATIONS',
-    'TEST ALL VARIATIONS AGAINST QWEN',
+    'TEST ALL VARIATIONS AGAINST AI',
     'JUDGE & SELECT WINNER',
     'REFINE & FINALIZE PROMPT'
   ];
@@ -1227,7 +1227,7 @@ async function runAgent() {
       callClaude(variation2, testTask, 200),
       callClaude(variation3, testTask, 200)
     ]);
-    setStepState(isExtract ? 4 : 3, 'done', `Tested all 3 variations against Qwen`);
+    setStepState(isExtract ? 4 : 3, 'done', `Tested all 3 variations`);
 
     // ── STEP 4/5: Judge winner ──
     setStepState(isExtract ? 4 : 4, 'running');
