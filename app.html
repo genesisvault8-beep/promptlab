@@ -449,6 +449,26 @@
   }
   .agent-step.done .step-output { display: block; color: rgba(240,240,240,0.6); }
 
+  /* ── PROVIDER TABS ── */
+  .provider-row {
+    display: flex; gap: 6px; margin-bottom: 10px;
+  }
+  .provider-btn {
+    flex: 1; padding: 7px 10px; text-align: center;
+    background: var(--card); border: 1px solid var(--border);
+    color: var(--dim); font-family: 'JetBrains Mono', monospace;
+    font-size: 9px; letter-spacing: 1px; cursor: pointer;
+    border-radius: 3px; transition: all 0.15s; text-transform: uppercase;
+  }
+  .provider-btn.active {
+    border-color: var(--accent); color: var(--accent);
+    background: rgba(232,255,71,0.05);
+  }
+  .provider-btn.qwen.active {
+    border-color: var(--blue); color: var(--blue);
+    background: rgba(71,180,255,0.05);
+  }
+
   /* ── TOAST ── */
   .toast {
     position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%) translateY(20px);
@@ -499,11 +519,23 @@
         <textarea id="user-prompt" rows="6" placeholder="Write your prompt here..."></textarea>
       </div>
 
+      <div class="sec-label" style="margin-bottom:8px">PROVIDER</div>
+      <div class="provider-row">
+        <button class="provider-btn active" id="prov-openrouter" onclick="selectProvider('openrouter')">OpenRouter</button>
+        <button class="provider-btn qwen" id="prov-qwen" onclick="selectProvider('qwen')">☁ Qwen Cloud</button>
+      </div>
+
       <div class="sec-label" style="margin-bottom:8px">MODEL</div>
-      <div class="model-row">
+      <div class="model-row" id="model-row-openrouter">
         <button class="model-btn active" onclick="selectModel(this,'anthropic/claude-haiku-4-5')">Claude Haiku</button>
         <button class="model-btn" onclick="selectModel(this,'openai/gpt-4o-mini')">GPT-4o Mini</button>
         <button class="model-btn" onclick="selectModel(this,'google/gemini-flash-1.5')">Gemini Flash</button>
+      </div>
+      <div class="model-row" id="model-row-qwen" style="display:none">
+        <button class="model-btn active" onclick="selectModel(this,'qwen-plus')">Qwen Plus</button>
+        <button class="model-btn" onclick="selectModel(this,'qwen-turbo')">Qwen Turbo</button>
+        <button class="model-btn" onclick="selectModel(this,'qwen-max')">Qwen Max</button>
+        <button class="model-btn" onclick="selectModel(this,'qwq-plus')">QwQ Plus</button>
       </div>
 
       <div class="sec-label" style="margin-bottom:8px">PARAMETERS</div>
@@ -658,21 +690,27 @@
 <div class="modal-overlay" id="modal-key">
   <div class="modal">
     <div class="modal-header">
-      <div class="modal-title">⚿ API KEY</div>
+      <div class="modal-title">⚿ API KEYS</div>
       <button class="modal-close" onclick="closeKeyModal()">✕</button>
     </div>
     <div class="modal-body">
-      <div class="modal-desc">
-        Enter your OpenRouter API key. Sign up free at openrouter.ai — gives you access to Claude, GPT-4o, Gemini and 100+ models. Key stays in your browser only.
-        <br><br>
-        Get your key at <span style="color:var(--accent)">openrouter.ai/keys</span>
+
+      <div class="sec-label" style="margin-bottom:6px">OPENROUTER KEY</div>
+      <div class="modal-desc" style="margin-bottom:8px">
+        Access Claude, GPT-4o, Gemini & 100+ models. Get yours at <span style="color:var(--accent)">openrouter.ai/keys</span>
       </div>
-      <div class="sec-label" style="margin-bottom:6px">YOUR API KEY</div>
-      <input type="password" id="key-input" placeholder="sk-ant-..." autocomplete="off" spellcheck="false">
+      <input type="password" id="key-input" placeholder="sk-or-..." autocomplete="off" spellcheck="false" style="margin-bottom:14px">
+
+      <div class="sec-label" style="margin-bottom:6px">QWEN CLOUD KEY</div>
+      <div class="modal-desc" style="margin-bottom:8px">
+        Access Qwen Plus, Turbo, Max & QwQ models. Get yours at <span style="color:var(--blue)">qwencloud.com</span> → API Keys
+      </div>
+      <input type="password" id="qwen-key-input" placeholder="sk-..." autocomplete="off" spellcheck="false">
+
     </div>
     <div class="modal-footer">
       <button class="action-btn" onclick="closeKeyModal()">CANCEL</button>
-      <button class="action-btn accent" onclick="saveKey()">SAVE KEY</button>
+      <button class="action-btn accent" onclick="saveKey()">SAVE KEYS</button>
     </div>
   </div>
 </div>
@@ -684,18 +722,21 @@
 // STATE
 // ══════════════════════════════════════
 let currentModel = 'anthropic/claude-haiku-4-5';
+let currentProvider = 'openrouter';
 let currentCat = 'all';
 let outputText = '';
 let savedPrompts = JSON.parse(localStorage.getItem('promptlab-saved') || '[]');
 let apiKey = localStorage.getItem('promptlab-openrouter-key') || '';
+let qwenKey = localStorage.getItem('promptlab-qwen-key') || '';
 
 // ══════════════════════════════════════
 // API KEY
 // ══════════════════════════════════════
 function updateKeyStatus() {
   const btn = document.getElementById('key-status-btn');
-  if (apiKey) {
-    btn.textContent = '⚿ KEY SET';
+  const activeKey = currentProvider === 'qwen' ? qwenKey : apiKey;
+  if (activeKey) {
+    btn.textContent = currentProvider === 'qwen' ? '☁ QWEN KEY SET' : '⚿ KEY SET';
     btn.className = 'key-status';
   } else {
     btn.textContent = '⚿ NO KEY';
@@ -705,6 +746,7 @@ function updateKeyStatus() {
 
 function openKeyModal() {
   document.getElementById('key-input').value = apiKey;
+  document.getElementById('qwen-key-input').value = qwenKey;
   document.getElementById('modal-key').classList.add('open');
 }
 
@@ -713,20 +755,40 @@ function closeKeyModal() {
 }
 
 function saveKey() {
-  const val = document.getElementById('key-input').value.trim();
-  if (!val) { showToast('Enter an API key'); return; }
-  apiKey = val;
-  localStorage.setItem('promptlab-openrouter-key', val);
+  const orVal = document.getElementById('key-input').value.trim();
+  const qwenVal = document.getElementById('qwen-key-input').value.trim();
+  if (!orVal && !qwenVal) { showToast('Enter at least one API key'); return; }
+  if (orVal) { apiKey = orVal; localStorage.setItem('promptlab-openrouter-key', orVal); }
+  if (qwenVal) { qwenKey = qwenVal; localStorage.setItem('promptlab-qwen-key', qwenVal); }
   updateKeyStatus();
   closeKeyModal();
-  showToast('API key saved ✓');
+  showToast('Keys saved ✓');
+}
+
+function selectProvider(provider) {
+  currentProvider = provider;
+  document.getElementById('prov-openrouter').className = 'provider-btn' + (provider === 'openrouter' ? ' active' : '');
+  document.getElementById('prov-qwen').className = 'provider-btn qwen' + (provider === 'qwen' ? ' active' : '');
+  document.getElementById('model-row-openrouter').style.display = provider === 'openrouter' ? 'flex' : 'none';
+  document.getElementById('model-row-qwen').style.display = provider === 'qwen' ? 'flex' : 'none';
+  // set default model for provider
+  if (provider === 'qwen') {
+    currentModel = 'qwen-plus';
+    document.querySelectorAll('#model-row-qwen .model-btn').forEach((b,i) => b.classList.toggle('active', i===0));
+  } else {
+    currentModel = 'anthropic/claude-haiku-4-5';
+    document.querySelectorAll('#model-row-openrouter .model-btn').forEach((b,i) => b.classList.toggle('active', i===0));
+  }
+  updateKeyStatus();
 }
 
 // ══════════════════════════════════════
 // CLAUDE API
 // ══════════════════════════════════════
 async function callClaude(systemPrompt, userPrompt, maxTokens = 500) {
-  if (!apiKey) { openKeyModal(); throw new Error('No API key — add your OpenRouter API key first.'); }
+  const isQwen = currentProvider === 'qwen';
+  const activeKey = isQwen ? qwenKey : apiKey;
+  if (!activeKey) { openKeyModal(); throw new Error(`No ${isQwen ? 'Qwen Cloud' : 'OpenRouter'} API key — add it in settings.`); }
 
   const body = {
     model: currentModel,
@@ -739,14 +801,22 @@ async function callClaude(systemPrompt, userPrompt, maxTokens = 500) {
   const tempVal = parseFloat(document.getElementById('temp-val').textContent);
   if (!isNaN(tempVal)) body.temperature = tempVal;
 
-  const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+  const endpoint = isQwen
+    ? 'https://dashscope-intl.aliyuncs.com/compatible-mode/v1/chat/completions'
+    : 'https://openrouter.ai/api/v1/chat/completions';
+
+  const headers = {
+    'Content-Type': 'application/json',
+    'Authorization': `Bearer ${activeKey}`,
+  };
+  if (!isQwen) {
+    headers['HTTP-Referer'] = 'https://promptlab.genesisvault.xyz';
+    headers['X-Title'] = 'PromptLab';
+  }
+
+  const response = await fetch(endpoint, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${apiKey}`,
-      'HTTP-Referer': 'https://promptlab.genesisvault.xyz',
-      'X-Title': 'PromptLab',
-    },
+    headers,
     body: JSON.stringify(body)
   });
 
