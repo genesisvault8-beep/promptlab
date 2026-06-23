@@ -738,7 +738,7 @@ async function callClaude(systemPrompt, userPrompt, maxTokens = 500) {
   const tempVal = parseFloat(document.getElementById('temp-val').textContent);
   if (!isNaN(tempVal)) body.temperature = tempVal;
 
-  const response = await fetch('https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions', {
+  const response = await fetch('https://ws-mcvdcg8ywqmn12b9.cn-hongkong.maas.aliyuncs.com/compatible-mode/v1/chat/completions', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
