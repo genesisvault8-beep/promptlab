@@ -180,7 +180,17 @@
   .feature-card:hover { border-color: var(--accent-dim); }
 
   .feature-icon {
-    font-size: 24px; margin-bottom: 14px;
+    width: 38px; height: 38px;
+    border-radius: 8px;
+    background: rgba(232,255,71,0.08);
+    border: 1px solid var(--accent-dim);
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 14px;
+  }
+  .feature-icon svg {
+    width: 18px; height: 18px;
+    stroke: var(--accent); fill: none;
+    stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round;
   }
 
   .feature-title {
@@ -301,7 +311,7 @@
 
 <nav>
   <div class="nav-logo">PROMPT<span>LAB</span></div>
-  <div class="nav-badge">● POWERED BY QWEN CLOUD</div>
+  <div class="nav-badge">● POWERED BY OPENROUTER</div>
   <div style="display:flex;align-items:center;gap:8px">
     <a href="app.html" class="nav-cta">▶ APP</a>
   </div>
@@ -317,11 +327,11 @@
     Better <span class="accent">Prompts.</span>
   </h1>
   <p class="hero-sub">
-    Auto-engineer, test, compare and save AI prompts powered by Qwen Cloud.
-    Bring your own Qwen Cloud key — we store nothing, send nothing, charge nothing.
+    Auto-engineer, test, compare and save AI prompts powered by Claude, ChatGPT and Gemini via OpenRouter.
+    Bring your own OpenRouter key — we store nothing, send nothing, charge nothing.
   </p>
   <div class="hero-actions">
-    <a href="app.html#agent" class="btn-primary">⚡ TRY THE AGENT</a>
+    <a href="app.html#agent" class="btn-primary">TRY THE AGENT</a>
     <a href="#features" class="btn-secondary">SEE FEATURES</a>
   </div>
 </section>
@@ -330,61 +340,61 @@
   <div class="features-label">// WHAT YOU GET</div>
   <div class="features-grid">
     <div class="feature-card">
-      <div class="feature-icon">⚡</div>
+      <div class="feature-icon"><svg viewBox="0 0 24 24"><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8z"/></svg></div>
       <div class="feature-title">PROMPT AGENT</div>
       <div class="feature-desc">Describe your goal — the agent generates 3 variations, tests them all against AI, judges the winner and refines it automatically. Zero manual iteration.</div>
     </div>
     <div class="feature-card">
-      <div class="feature-icon">📖</div>
+      <div class="feature-icon"><svg viewBox="0 0 24 24"><path d="M3 5.5c2.2-1 5-1 7 .3v12.7c-2-1.3-4.8-1.3-7-.3V5.5z"/><path d="M21 5.5c-2.2-1-5-1-7 .3v12.7c2-1.3 4.8-1.3 7-.3V5.5z"/></svg></div>
       <div class="feature-title">STYLE EXTRACTOR</div>
       <div class="feature-desc">Paste any novel, story or article. The agent extracts the writing style, tone and patterns and turns them into reusable prompt templates.</div>
     </div>
     <div class="feature-card">
-      <div class="feature-icon">🖊️</div>
+      <div class="feature-icon"><svg viewBox="0 0 24 24"><path d="M4 20h4L18.5 9.5a2.1 2.1 0 0 0-3-3L5 17v3z"/><path d="M13.5 8l3 3"/></svg></div>
       <div class="feature-title">PROMPT EDITOR</div>
-      <div class="feature-desc">Write system + user prompts, pick your Qwen model, tune max tokens and temperature. Run against Qwen Plus, Turbo, Max or QwQ and see output instantly.</div>
+      <div class="feature-desc">Write system + user prompts, pick your model, tune max tokens and temperature. Run against Claude, ChatGPT or Gemini and see output instantly.</div>
     </div>
     <div class="feature-card">
-      <div class="feature-icon">⚖️</div>
+      <div class="feature-icon"><svg viewBox="0 0 24 24"><path d="M12 3v18"/><path d="M8 21h8"/><path d="M6 7h4M14 7h4"/><path d="M4 7l2 5 2-5M16 7l2 5 2-5"/></svg></div>
       <div class="feature-title">COMPARE MODE</div>
       <div class="feature-desc">Run two prompt variations simultaneously. AI judges which output is better — real AI scoring, not random numbers.</div>
     </div>
     <div class="feature-card">
-      <div class="feature-icon">📚</div>
+      <div class="feature-icon"><svg viewBox="0 0 24 24"><path d="M12 3 3 8l9 5 9-5-9-5z"/><path d="M3 13l9 5 9-5"/></svg></div>
       <div class="feature-title">PROMPT LIBRARY</div>
       <div class="feature-desc">12 battle-tested templates across writing, code, marketing, security and analysis. One click to load and customize.</div>
     </div>
     <div class="feature-card">
-      <div class="feature-icon">💾</div>
+      <div class="feature-icon"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="1.5"/><path d="M8 4v5h8V4"/><path d="M8 20v-6h8v6"/></svg></div>
       <div class="feature-title">SAVE & RESTORE</div>
       <div class="feature-desc">Save your best prompts locally. Load them back anytime. Export to JSON. Your prompts stay yours — no account needed.</div>
     </div>
     <div class="feature-card">
-      <div class="feature-icon">📊</div>
+      <div class="feature-icon"><svg viewBox="0 0 24 24"><rect x="4" y="12" width="3.5" height="8"/><rect x="10.25" y="7" width="3.5" height="13"/><rect x="16.5" y="3" width="3.5" height="17"/></svg></div>
       <div class="feature-title">PROMPT ANALYZER</div>
       <div class="feature-desc">Instant feedback on clarity score, token count and word count. Know if your prompt is structured for success before you run it.</div>
     </div>
     <div class="feature-card">
-      <div class="feature-icon">🔑</div>
+      <div class="feature-icon"><svg viewBox="0 0 24 24"><circle cx="8" cy="15" r="4"/><path d="M11 12l9-9"/><path d="M17 6l2.5 2.5"/><path d="M14 9l2 2"/></svg></div>
       <div class="feature-title">BYOK — YOUR KEY</div>
-      <div class="feature-desc">Paste your Qwen Cloud API key once. It stays in your browser only. We never see it, never store it, never touch your usage.</div>
+      <div class="feature-desc">Paste your OpenRouter API key once. It stays in your browser only. We never see it, never store it, never touch your usage.</div>
     </div>
   </div>
 </section>
 
 <section class="byok">
   <div class="byok-inner">
-    <div class="byok-title">Bring Your Own <span>Qwen Key</span></div>
+    <div class="byok-title">Bring Your Own <span>OpenRouter Key</span></div>
     <p class="byok-desc">
-      PromptLab calls Qwen Cloud directly from your browser using your API key.
-      Zero middlemen. Zero markup. Access Qwen Plus, Turbo, Max and QwQ — you pay Qwen Cloud's standard rates, nothing extra.
+      PromptLab calls OpenRouter directly from your browser using your API key.
+      Zero middlemen. Zero markup. Access Claude, ChatGPT and Gemini — you pay OpenRouter's standard rates, nothing extra.
     </p>
     <div class="byok-flow">
-      <div class="flow-step">Your Qwen Key</div>
+      <div class="flow-step">Your OpenRouter Key</div>
       <div class="flow-arrow">→</div>
       <div class="flow-step">Your Browser</div>
       <div class="flow-arrow">→</div>
-      <div class="flow-step">Qwen Cloud API</div>
+      <div class="flow-step">OpenRouter API</div>
       <div class="flow-arrow">→</div>
       <div class="flow-step">Real Output</div>
     </div>
@@ -399,8 +409,8 @@
       <span class="stat-label">PROMPT TEMPLATES</span>
     </div>
     <div class="stat-item">
-      <span class="stat-num">4</span>
-      <span class="stat-label">QWEN MODELS</span>
+      <span class="stat-num">3</span>
+      <span class="stat-label">AI MODELS</span>
     </div>
     <div class="stat-item">
       <span class="stat-num">0</span>
