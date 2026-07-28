@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Privacy Policy — PromptLab</title>
+<meta name="description" content="PromptLab's privacy policy. We don't run servers, don't store your API keys, and don't collect your prompts. Here's exactly what that means.">
+<link rel="canonical" href="https://promptlab.genesisvault.xyz/privacy.html">
+<meta name="theme-color" content="#0c0c0e">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;700&family=Unbounded:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0c0c0e;
+    --surface: #111114;
+    --card: #16161a;
+    --border: rgba(255,255,255,0.07);
+    --accent: #e8ff47;
+    --accent-dim: rgba(232,255,71,0.15);
+    --blue: #47b4ff;
+    --pink: #ff47a8;
+    --green: #47ffb4;
+    --text: #f0f0f0;
+    --dim: rgba(240,240,240,0.4);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'JetBrains Mono', monospace;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  .bg-glow {
+    position: fixed; inset: 0; pointer-events: none; z-index: 0;
+    background:
+      radial-gradient(ellipse 60% 40% at 50% 0%, rgba(232,255,71,0.07) 0%, transparent 60%),
+      radial-gradient(ellipse 40% 30% at 80% 80%, rgba(71,180,255,0.05) 0%, transparent 50%);
+  }
+
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 5%; height: 60px;
+    background: rgba(12,12,14,0.85); backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .nav-logo {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 14px; font-weight: 900;
+    color: var(--accent); letter-spacing: 2px;
+    text-shadow: 0 0 20px rgba(232,255,71,0.4);
+    text-decoration: none;
+  }
+
+  .nav-logo span { color: var(--text); }
+
+  .nav-back {
+    color: var(--dim);
+    text-decoration: none;
+    font-size: 13px;
+    transition: color 0.2s;
+  }
+  .nav-back:hover { color: var(--accent); }
+
+  main {
+    position: relative; z-index: 2;
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 120px 24px 100px;
+  }
+
+  h1 {
+    font-family: 'Unbounded', sans-serif;
+    font-size: clamp(28px, 5vw, 40px);
+    font-weight: 900;
+    margin-bottom: 8px;
+  }
+
+  .updated {
+    color: var(--dim);
+    font-size: 13px;
+    margin-bottom: 48px;
+  }
+
+  h2 {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 18px;
+    color: var(--accent);
+    margin: 40px 0 12px;
+  }
+
+  p, li {
+    font-size: 15px;
+    line-height: 1.7;
+    color: rgba(240,240,240,0.8);
+    margin-bottom: 14px;
+  }
+
+  ul { padding-left: 20px; margin-bottom: 14px; }
+
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px 24px;
+    margin: 24px 0;
+  }
+
+  a.inline { color: var(--blue); }
+
+  footer {
+    position: relative; z-index: 2;
+    border-top: 1px solid var(--border);
+    padding: 32px 5%;
+    text-align: center;
+    color: var(--dim);
+    font-size: 13px;
+  }
+</style>
+</head>
+<body>
+
+<div class="bg-glow"></div>
+
+<nav>
+  <a href="index.html" class="nav-logo">PROMPT<span>LAB</span></a>
+  <a href="index.html" class="nav-back">← Back to PromptLab</a>
+</nav>
+
+<main>
+  <h1>Privacy Policy</h1>
+  <p class="updated">Last updated: July 2026</p>
+
+  <p>PromptLab is built to work entirely in your browser. This page explains, plainly, what that means for your data.</p>
+
+  <h2>What we don't do</h2>
+  <div class="card">
+    <ul>
+      <li>We don't run a backend server for PromptLab. There's no database where your prompts, outputs, or API keys are stored.</li>
+      <li>We don't require an account, email, or sign-up of any kind.</li>
+      <li>We don't see, log, or transmit your OpenRouter API key to anywhere except OpenRouter itself.</li>
+      <li>We don't sell or share data, because we don't collect any to begin with.</li>
+    </ul>
+  </div>
+
+  <h2>How your API key is handled</h2>
+  <p>When you paste your OpenRouter API key into PromptLab, it's stored in your browser's local storage only. Every request — prompt generation, comparison, style extraction — goes directly from your browser to OpenRouter's API. Genesis Vault's servers are never in that request path.</p>
+
+  <h2>Your prompts and saved data</h2>
+  <p>Prompts you save in the Prompt Library are stored locally in your browser (localStorage). If you clear your browser data or switch devices, that data doesn't transfer, because it was never sent to us in the first place.</p>
+
+  <h2>Third-party services</h2>
+  <p>PromptLab sends your requests to <a class="inline" href="https://openrouter.ai" target="_blank" rel="noopener">OpenRouter</a>, which routes them to the AI model you select (Claude, GPT-4o, Gemini, or others available on OpenRouter). Those requests are subject to OpenRouter's own privacy policy and the policies of the underlying model provider. We don't control or have visibility into that layer.</p>
+
+  <h2>Analytics</h2>
+  <p>If PromptLab uses any basic, privacy-respecting analytics (such as aggregate page-view counts) to understand traffic, it does not collect personal data, prompt content, or API keys. No cross-site tracking or ad-targeting cookies are used.</p>
+
+  <h2>Cookies</h2>
+  <p>PromptLab doesn't use cookies for tracking. Browser localStorage is used only to save your preferences and saved prompts locally on your device.</p>
+
+  <h2>Changes to this policy</h2>
+  <p>If this policy changes, the "last updated" date at the top of this page will reflect it. Continued use of PromptLab after changes means you accept the updated terms.</p>
+
+  <h2>Contact</h2>
+  <p>Questions about this policy can be directed through Genesis Vault at <a class="inline" href="https://genesisvault.xyz" target="_blank" rel="noopener">genesisvault.xyz</a>.</p>
+</main>
+
+<footer>
+  PROMPTLAB — By GenesisVault · © 2026 GENESISVAULT.XYZ
+</footer>
+
+</body>
+</html>
