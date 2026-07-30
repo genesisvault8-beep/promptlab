@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>How to Write Prompts That Actually Work — PromptLab</title>
+<meta name="description" content="A practical framework for writing AI prompts that get reliable results — role, context, task, format, and the mistakes most people make.">
+<link rel="canonical" href="https://promptlab.genesisvault.xyz/how-to-write-better-prompts.html">
+<meta name="theme-color" content="#0c0c0e">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;700&family=Unbounded:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#0c0c0e;--card:#16161a;--border:rgba(255,255,255,0.07);--accent:#e8ff47;--blue:#47b4ff;--text:#f0f0f0;--dim:rgba(240,240,240,0.4);}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--bg);color:var(--text);font-family:'JetBrains Mono',monospace;min-height:100vh;overflow-x:hidden;}
+  .bg-glow{position:fixed;inset:0;pointer-events:none;z-index:0;background:radial-gradient(ellipse 60% 40% at 50% 0%,rgba(232,255,71,0.07) 0%,transparent 60%),radial-gradient(ellipse 40% 30% at 80% 80%,rgba(71,180,255,0.05) 0%,transparent 50%);}
+  nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:0 5%;height:60px;background:rgba(12,12,14,0.85);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);}
+  .nav-logo{font-family:'Unbounded',sans-serif;font-size:14px;font-weight:900;color:var(--accent);letter-spacing:2px;text-shadow:0 0 20px rgba(232,255,71,0.4);text-decoration:none;}
+  .nav-logo span{color:var(--text);}
+  .nav-back{color:var(--dim);text-decoration:none;font-size:13px;transition:color 0.2s;}
+  .nav-back:hover{color:var(--accent);}
+  main{position:relative;z-index:2;max-width:760px;margin:0 auto;padding:120px 24px 100px;}
+  .tag{color:var(--blue);font-size:12px;letter-spacing:2px;text-transform:uppercase;margin-bottom:16px;}
+  h1{font-family:'Unbounded',sans-serif;font-size:clamp(28px,5vw,40px);font-weight:900;margin-bottom:8px;line-height:1.2;}
+  .updated{color:var(--dim);font-size:13px;margin-bottom:48px;}
+  h2{font-family:'Unbounded',sans-serif;font-size:20px;color:var(--accent);margin:40px 0 12px;}
+  h3{font-size:15px;color:var(--text);margin:24px 0 8px;}
+  p,li{font-size:15px;line-height:1.75;color:rgba(240,240,240,0.8);margin-bottom:14px;}
+  ul,ol{padding-left:20px;margin-bottom:14px;}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:20px 24px;margin:20px 0;}
+  .prompt-example{background:#0a0a0c;border:1px solid var(--border);border-left:2px solid var(--accent);border-radius:6px;padding:16px 20px;margin:16px 0;font-size:13.5px;color:rgba(240,240,240,0.75);white-space:pre-wrap;}
+  .cta{display:block;text-align:center;background:var(--accent);color:#0c0c0e;font-family:'Unbounded',sans-serif;font-weight:700;text-decoration:none;padding:16px;border-radius:8px;margin:40px 0;font-size:14px;}
+  footer{position:relative;z-index:2;border-top:1px solid var(--border);padding:32px 5%;text-align:center;color:var(--dim);font-size:13px;}
+</style>
+</head>
+<body>
+<div class="bg-glow"></div>
+<nav>
+  <a href="index.html" class="nav-logo">PROMPT<span>LAB</span></a>
+  <a href="blog.html" class="nav-back">← Back to Blog</a>
+</nav>
+<main>
+  <div class="tag">// Fundamentals</div>
+  <h1>How to Write Prompts That Actually Work</h1>
+  <p class="updated">A practical framework — not theory</p>
+
+  <p>Most bad AI output isn't a model problem. It's a prompt problem. The same model that gives you a generic, hedge-everything answer to a vague prompt can give you something sharp and specific if you structure the request differently. Here's the framework we use inside PromptLab's auto-engineer feature, broken down so you can apply it manually too.</p>
+
+  <h2>The four parts of a working prompt</h2>
+  <p>Every prompt that reliably produces good output has some version of these four elements, even if they're not labeled:</p>
+
+  <h3>1. Role</h3>
+  <p>Tell the model what perspective to answer from. Not "you are a helpful assistant" — that's the default anyway. Be specific: "you are a senior backend engineer reviewing this code for production readiness" changes the vocabulary, the assumptions, and the level of detail you get back.</p>
+
+  <h3>2. Context</h3>
+  <p>Models can't read your mind or your codebase. If the task depends on constraints — a tech stack, an audience, a tone, a prior decision you've already made — state it. Omitted context is the single biggest cause of generic output.</p>
+
+  <h3>3. Task</h3>
+  <p>Say exactly what you want done, as a verb: "summarize," "rewrite," "critique," "generate three variations," "find the bug." Vague tasks like "help me with this" force the model to guess your intent, and it will guess conservatively.</p>
+
+  <h3>4. Format</h3>
+  <p>Specify how you want the answer structured — bullet points, a table, JSON, under 200 words, no preamble. Without this, models default to a safe middle ground: some prose, some structure, usually longer than you wanted.</p>
+
+  <h2>A before-and-after example</h2>
+  <p>Weak prompt:</p>
+  <div class="prompt-example">Help me write a product description for my app.</div>
+
+  <p>Strong prompt:</p>
+  <div class="prompt-example">You are a conversion-focused copywriter for developer tools. Write a 3-sentence product description for a Chrome extension that auto-fills API keys during local testing. Audience: backend developers who hate repetitive setup. Tone: direct, no marketing fluff. No emoji.</div>
+
+  <p>The second version doesn't just get you a better answer — it gets you a <em>predictable</em> answer, which is what actually matters when you're iterating.</p>
+
+  <h2>Common mistakes</h2>
+  <ul>
+    <li><strong>Stacking too many tasks in one prompt.</strong> "Write this, then critique it, then rewrite it" tends to produce a rushed version of all three. Split into separate turns.</li>
+    <li><strong>Assuming the model remembers your style.</strong> Unless you're in the same conversation, restate tone and constraints each time.</li>
+    <li><strong>Not specifying what to exclude.</strong> "Don't use corporate jargon" or "no bullet points" is often more useful than describing what you do want.</li>
+    <li><strong>Treating the first output as final.</strong> Prompt engineering is iterative — refine based on what came back rather than starting over.</li>
+  </ul>
+
+  <h2>Where this fits into PromptLab</h2>
+  <p>PromptLab's auto-engineer feature applies this framework automatically — you give it a rough idea, and it fills in role, context, format, and task structure before sending it to the model. The template library takes this further with pre-built structures for common jobs like code review, marketing copy, and security analysis, so you're not rebuilding the same scaffolding every time.</p>
+
+  <a href="app.html" class="cta">TRY THE PROMPT ENGINEER →</a>
+</main>
+<footer>PROMPTLAB — By GenesisVault · © 2026 GENESISVAULT.XYZ</footer>
+</body>
+</html>
