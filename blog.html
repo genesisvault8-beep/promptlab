@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Blog — PromptLab</title>
+<meta name="description" content="Practical, no-fluff guides on prompt engineering — writing better prompts, choosing models, and getting reliable output from Claude, GPT-4o, and Gemini.">
+<link rel="canonical" href="https://promptlab.genesisvault.xyz/blog.html">
+<meta name="theme-color" content="#0c0c0e">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;700&family=Unbounded:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#0c0c0e;--card:#16161a;--border:rgba(255,255,255,0.07);--accent:#e8ff47;--blue:#47b4ff;--text:#f0f0f0;--dim:rgba(240,240,240,0.4);}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--bg);color:var(--text);font-family:'JetBrains Mono',monospace;min-height:100vh;overflow-x:hidden;}
+  .bg-glow{position:fixed;inset:0;pointer-events:none;z-index:0;background:radial-gradient(ellipse 60% 40% at 50% 0%,rgba(232,255,71,0.07) 0%,transparent 60%),radial-gradient(ellipse 40% 30% at 80% 80%,rgba(71,180,255,0.05) 0%,transparent 50%);}
+  nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:0 5%;height:60px;background:rgba(12,12,14,0.85);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);}
+  .nav-logo{font-family:'Unbounded',sans-serif;font-size:14px;font-weight:900;color:var(--accent);letter-spacing:2px;text-shadow:0 0 20px rgba(232,255,71,0.4);text-decoration:none;}
+  .nav-logo span{color:var(--text);}
+  .nav-back{color:var(--dim);text-decoration:none;font-size:13px;transition:color 0.2s;}
+  .nav-back:hover{color:var(--accent);}
+  main{position:relative;z-index:2;max-width:820px;margin:0 auto;padding:120px 24px 100px;}
+  h1{font-family:'Unbounded',sans-serif;font-size:clamp(28px,5vw,40px);font-weight:900;margin-bottom:8px;line-height:1.2;}
+  .sub{color:var(--dim);font-size:15px;margin-bottom:48px;}
+  .post{display:block;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:24px 28px;margin-bottom:16px;text-decoration:none;transition:border-color 0.2s,transform 0.2s;}
+  .post:hover{border-color:var(--accent);transform:translateY(-2px);}
+  .post-tag{color:var(--blue);font-size:11px;letter-spacing:2px;text-transform:uppercase;margin-bottom:8px;}
+  .post-title{font-family:'Unbounded',sans-serif;font-size:18px;color:var(--text);margin-bottom:8px;}
+  .post-desc{font-size:14px;line-height:1.6;color:rgba(240,240,240,0.6);}
+  footer{position:relative;z-index:2;border-top:1px solid var(--border);padding:32px 5%;text-align:center;color:var(--dim);font-size:13px;}
+</style>
+</head>
+<body>
+<div class="bg-glow"></div>
+<nav>
+  <a href="index.html" class="nav-logo">PROMPT<span>LAB</span></a>
+  <a href="index.html" class="nav-back">← Back to PromptLab</a>
+</nav>
+<main>
+  <h1>Blog</h1>
+  <p class="sub">Practical prompt engineering — no fluff, no "10x your productivity" headlines.</p>
+
+  <a href="how-to-write-better-prompts.html" class="post">
+    <div class="post-tag">Fundamentals</div>
+    <div class="post-title">How to Write Prompts That Actually Work</div>
+    <div class="post-desc">A practical framework — role, context, task, format — plus the four most common mistakes that quietly wreck output quality.</div>
+  </a>
+
+  <a href="claude-vs-gpt4o-vs-gemini.html" class="post">
+    <div class="post-tag">Model Selection</div>
+    <div class="post-title">Claude vs GPT-4o vs Gemini: Choosing the Right Model</div>
+    <div class="post-desc">A practical breakdown of what each model tends to be better at, and why testing beats trusting a benchmark.</div>
+  </a>
+
+  <a href="prompt-engineering-for-code.html" class="post">
+    <div class="post-tag">Code</div>
+    <div class="post-title">Prompt Engineering for Code Generation</div>
+    <div class="post-desc">How to get reliable code output instead of confident-sounding bugs — environment specs, style-matching, and edge-case prompts.</div>
+  </a>
+
+  <a href="system-prompts-vs-user-prompts.html" class="post">
+    <div class="post-tag">Fundamentals</div>
+    <div class="post-title">System Prompts vs User Prompts: What's the Difference?</div>
+    <div class="post-desc">Two different jobs, often confused for one — and why mixing them up causes inconsistent behavior across a conversation.</div>
+  </a>
+
+  <a href="ai-marketing-copy-that-doesnt-sound-like-ai.html" class="post">
+    <div class="post-tag">Marketing</div>
+    <div class="post-title">Writing AI Marketing Copy That Doesn't Sound Like AI</div>
+    <div class="post-desc">Why AI copy defaults to "unlock," "elevate," and "seamless" — and the prompt techniques that fix it.</div>
+  </a>
+</main>
+<footer>PROMPTLAB — By GenesisVault · © 2026 GENESISVAULT.XYZ</footer>
+</body>
+</html>
