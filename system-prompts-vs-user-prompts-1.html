@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>System Prompts vs User Prompts: What's the Difference — PromptLab</title>
+<meta name="description" content="Why system prompts and user prompts serve different jobs, and how mixing them up leads to inconsistent AI output.">
+<link rel="canonical" href="https://promptlab.genesisvault.xyz/system-prompts-vs-user-prompts.html">
+<meta name="theme-color" content="#0c0c0e">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;700&family=Unbounded:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#0c0c0e;--card:#16161a;--border:rgba(255,255,255,0.07);--accent:#e8ff47;--blue:#47b4ff;--text:#f0f0f0;--dim:rgba(240,240,240,0.4);}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--bg);color:var(--text);font-family:'JetBrains Mono',monospace;min-height:100vh;overflow-x:hidden;}
+  .bg-glow{position:fixed;inset:0;pointer-events:none;z-index:0;background:radial-gradient(ellipse 60% 40% at 50% 0%,rgba(232,255,71,0.07) 0%,transparent 60%),radial-gradient(ellipse 40% 30% at 80% 80%,rgba(71,180,255,0.05) 0%,transparent 50%);}
+  nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:0 5%;height:60px;background:rgba(12,12,14,0.85);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);}
+  .nav-logo{font-family:'Unbounded',sans-serif;font-size:14px;font-weight:900;color:var(--accent);letter-spacing:2px;text-shadow:0 0 20px rgba(232,255,71,0.4);text-decoration:none;}
+  .nav-logo span{color:var(--text);}
+  .nav-back{color:var(--dim);text-decoration:none;font-size:13px;transition:color 0.2s;}
+  .nav-back:hover{color:var(--accent);}
+  main{position:relative;z-index:2;max-width:760px;margin:0 auto;padding:120px 24px 100px;}
+  .tag{color:var(--blue);font-size:12px;letter-spacing:2px;text-transform:uppercase;margin-bottom:16px;}
+  h1{font-family:'Unbounded',sans-serif;font-size:clamp(28px,5vw,40px);font-weight:900;margin-bottom:8px;line-height:1.2;}
+  .updated{color:var(--dim);font-size:13px;margin-bottom:48px;}
+  h2{font-family:'Unbounded',sans-serif;font-size:20px;color:var(--accent);margin:40px 0 12px;}
+  p,li{font-size:15px;line-height:1.75;color:rgba(240,240,240,0.8);margin-bottom:14px;}
+  ul{padding-left:20px;margin-bottom:14px;}
+  table{width:100%;border-collapse:collapse;margin:20px 0;font-size:13.5px;}
+  th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--border);vertical-align:top;}
+  th{color:var(--accent);font-weight:700;}
+  td{color:rgba(240,240,240,0.75);}
+  .prompt-example{background:#0a0a0c;border:1px solid var(--border);border-left:2px solid var(--accent);border-radius:6px;padding:16px 20px;margin:16px 0;font-size:13.5px;color:rgba(240,240,240,0.75);white-space:pre-wrap;}
+  .cta{display:block;text-align:center;background:var(--accent);color:#0c0c0e;font-family:'Unbounded',sans-serif;font-weight:700;text-decoration:none;padding:16px;border-radius:8px;margin:40px 0;font-size:14px;}
+  footer{position:relative;z-index:2;border-top:1px solid var(--border);padding:32px 5%;text-align:center;color:var(--dim);font-size:13px;}
+</style>
+</head>
+<body>
+<div class="bg-glow"></div>
+<nav>
+  <a href="index.html" class="nav-logo">PROMPT<span>LAB</span></a>
+  <a href="blog.html" class="nav-back">← Back to Blog</a>
+</nav>
+<main>
+  <div class="tag">// Fundamentals</div>
+  <h1>System Prompts vs User Prompts: What's the Difference?</h1>
+  <p class="updated">Two different jobs, often confused for one</p>
+
+  <p>If you've used the API for Claude, GPT-4o, or Gemini directly (rather than just a chat interface), you've run into the split between a "system" message and a "user" message. Mixing up what belongs in each is one of the most common reasons prompts behave inconsistently across a session.</p>
+
+  <h2>What each one is for</h2>
+  <table>
+    <tr><th>System prompt</th><th>User prompt</th></tr>
+    <tr><td>Sets persistent behavior for the whole conversation — role, tone, rules, output format</td><td>The specific request or question for this turn</td></tr>
+    <tr><td>Set once, applies to every response</td><td>Changes with every message</td></tr>
+    <tr><td>Example: "You are a concise technical writer. Never use bullet points unless asked."</td><td>Example: "Explain how OAuth token refresh works."</td></tr>
+  </table>
+
+  <h2>Why the split matters</h2>
+  <p>If you put persistent instructions in the user prompt instead of the system prompt, you have to repeat them every single message, and the model may weight them less consistently over a long conversation. If you put a one-off task in the system prompt, it can bleed into every future response even when it's no longer relevant.</p>
+
+  <h2>A practical example</h2>
+  <p>System prompt (set once):</p>
+  <div class="prompt-example">You are a senior copyeditor. Respond only with the corrected text — no explanations, no commentary, unless explicitly asked. Preserve the original tone and voice; only fix grammar, clarity, and flow.</div>
+
+  <p>User prompt (changes each time):</p>
+  <div class="prompt-example">[paste paragraph to edit]</div>
+
+  <p>With this split, you can paste a new paragraph every message and get consistent, explanation-free edits without restating the rules — because they live in the system prompt, not the user prompt.</p>
+
+  <h2>What if there's no system prompt field?</h2>
+  <p>Some interfaces (like a basic chat window) only expose one input box. In that case, the common workaround is to put your "system-style" instructions at the very start of the first message, clearly separated from the actual request — something PromptLab's auto-engineer does automatically when you're working against a model or interface that doesn't separate the two.</p>
+
+  <h2>Common mistake: re-litigating the system prompt mid-conversation</h2>
+  <p>If your system prompt says "always respond in bullet points" and three messages later you ask for prose "just this once," some models will revert back to bullets on the next message because the system instruction is still anchoring behavior. Being explicit about scope — "for this response only, use prose" — helps.</p>
+
+  <a href="app.html" class="cta">BUILD A SYSTEM PROMPT →</a>
+</main>
+<footer>PROMPTLAB — By GenesisVault · © 2026 GENESISVAULT.XYZ</footer>
+<script>(function(s){s.dataset.zone='11584046',s.src='https://nap5k.com/tag.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))</script>
+</body>
+</html>
