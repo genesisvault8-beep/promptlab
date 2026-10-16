@@ -291,9 +291,11 @@
   }
 
   .footer-links {
-    display: flex; gap: 20px;
+    display: flex; gap: 8px 20px; flex-wrap: wrap; justify-content: center;
     font-size: 10px; letter-spacing: 1px; color: var(--dim);
   }
+  .footer-links a { transition: color .2s; }
+  .footer-links a:hover { color: var(--accent) !important; }
 
   .footer-copy {
     font-size: 9px; color: var(--dim); letter-spacing: 1px;
@@ -401,6 +403,9 @@
       <div class="flow-arrow">→</div>
       <div class="flow-step">Real Output</div>
     </div>
+    <p class="byok-desc" style="margin-top:20px;font-size:12px">
+      Don't have a key yet? <a href="https://openrouter.ai/keys" target="_blank" rel="noopener" style="color:var(--accent)">Get one free at openrouter.ai/keys</a>.
+    </p>
     <a href="app.html" class="btn-primary">GET STARTED FREE</a>
   </div>
 </section>
@@ -429,11 +434,12 @@
 <footer>
   <div class="footer-logo">PROMPTLAB</div>
   <div class="footer-links">
-    <span>By GenesisVault</span>
+    <a href="https://genesisvault.xyz" style="color:var(--dim);text-decoration:none">By GenesisVault</a>
     <a href="app.html" style="color:var(--accent);text-decoration:none">Launch App →</a>
-    <a href="blog.html" style="color:var(--dim);text-decoration:none;margin-left:20px">Blog</a>
-    <a href="privacy.html" style="color:var(--dim);text-decoration:none;margin-left:20px">Privacy</a>
-    <a href="terms.html" style="color:var(--dim);text-decoration:none;margin-left:20px">Terms</a>
+    <a href="blog.html" style="color:var(--dim);text-decoration:none">Blog</a>
+    <a href="privacy.html" style="color:var(--dim);text-decoration:none">Privacy</a>
+    <a href="terms.html" style="color:var(--dim);text-decoration:none">Terms</a>
+    <a href="https://openrouter.ai" target="_blank" rel="noopener" style="color:var(--dim);text-decoration:none">Powered by OpenRouter</a>
   </div>
   <div class="footer-copy">© 2026 GENESISVAULT.XYZ</div>
 </footer>
