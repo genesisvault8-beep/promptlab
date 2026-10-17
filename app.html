@@ -509,8 +509,8 @@
       <div class="sec-label" style="margin-bottom:8px">PARAMETERS</div>
       <div class="params-row">
         <div class="param-item">
-          <div class="param-label">MAX TOKENS <span class="param-val" id="tok-val">500</span></div>
-          <input type="range" min="100" max="2000" value="500" oninput="document.getElementById('tok-val').textContent=this.value">
+          <div class="param-label">MAX TOKENS <span class="param-val" id="tok-val">1500</span></div>
+          <input type="range" min="100" max="2000" value="1500" oninput="document.getElementById('tok-val').textContent=this.value">
         </div>
         <div class="param-item">
           <div class="param-label">TEMPERATURE <span class="param-val" id="temp-val">0.7</span></div>
@@ -663,7 +663,7 @@
     </div>
     <div class="modal-body">
       <div class="modal-desc">
-        Enter your OpenRouter API key to access Claude, ChatGPT and Gemini — all through one key. Get yours free at <span style="color:var(--blue)">openrouter.ai</span> → Keys. Your key stays in your browser only — never sent to us.
+        Enter your OpenRouter API key to access Claude, ChatGPT and Gemini — all through one key. Get yours free at <a href="https://openrouter.ai/keys" target="_blank" rel="noopener" style="color:var(--blue)">openrouter.ai/keys</a>. Your key stays in your browser only — never sent to us.
       </div>
       <div class="sec-label" style="margin-bottom:6px">YOUR OPENROUTER KEY</div>
       <input type="password" id="key-input" placeholder="sk-..." autocomplete="off" spellcheck="false">
@@ -941,8 +941,8 @@ async function runCompare() {
   try {
     // Run both prompts simultaneously
     const [resA, resB] = await Promise.all([
-      callClaude('', a, 400),
-      callClaude('', b, 400)
+      callClaude('', a, 800),
+      callClaude('', b, 800)
     ]);
 
     outA.textContent = resA; outA.className = 'compare-output filled';
