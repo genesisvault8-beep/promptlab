@@ -32,7 +32,12 @@
   td{color:rgba(240,240,240,0.75);}
   .cta{display:block;text-align:center;background:var(--accent);color:#0c0c0e;font-family:'Unbounded',sans-serif;font-weight:700;text-decoration:none;padding:16px;border-radius:8px;margin:40px 0;font-size:14px;}
   footer{position:relative;z-index:2;border-top:1px solid var(--border);padding:32px 5%;text-align:center;color:var(--dim);font-size:13px;}
+  .related{margin:48px 0 0;padding-top:24px;border-top:1px solid var(--border);}
+  .related h2{margin-top:0;}
+  .related a{display:block;color:var(--accent);text-decoration:none;padding:8px 0;font-size:14px;}
+  .related a:hover{text-decoration:underline;}
 </style>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Which model is best overall?", "acceptedAnswer": {"@type": "Answer", "text": "There isn't one best model. Each tends to be stronger at different things, and the rankings shift as providers release updates. The practical approach is to pick a sensible default, then test your own prompts against alternatives when quality or cost matters."}}, {"@type": "Question", "name": "Do the same prompts work across Claude, GPT-4o and Gemini?", "acceptedAnswer": {"@type": "Answer", "text": "The structure of a good prompt, with a clear role, context, task and format, carries over well. Details like length, tone and how strictly instructions are followed can differ, so it is worth checking the output rather than assuming it will match."}}, {"@type": "Question", "name": "Should I use the cheapest model to save money?", "acceptedAnswer": {"@type": "Answer", "text": "For simple, repeatable tasks like classification, extraction or short rewrites, a smaller and cheaper model is often good enough. For nuanced writing, complex reasoning or code, test whether the cheaper model's quality holds up before switching. Check current pricing on OpenRouter, because rates change."}}, {"@type": "Question", "name": "How often should I re-test my model choice?", "acceptedAnswer": {"@type": "Answer", "text": "Whenever a provider releases a new version, or when you notice quality or cost problems. A saved set of three or four representative prompts makes re-testing quick."}}]}</script>
 </head>
 <body>
 <div class="bg-glow"></div>
@@ -76,10 +81,64 @@
   <h2>Gemini</h2>
   <p>Gemini's strength is context window and multimodal input — if you're feeding in a large document, a codebase, or images alongside text, it tends to handle that combination more natively. It's also often the cheapest option at comparable quality, which matters if you're iterating a lot.</p>
 
+  <h2>How to run a fair comparison</h2>
+  <p>Comparing models only tells you something if the test is fair. Otherwise you are comparing your setup, not the models:</p>
+  <ul>
+    <li><strong>Use the exact same prompt</strong> for every model, word for word.</li>
+    <li><strong>Keep the settings the same.</strong> Match max tokens and temperature, because they change length and variety on their own.</li>
+    <li><strong>Run each prompt more than once.</strong> One lucky or unlucky answer proves little. Two or three runs show how consistent a model is.</li>
+    <li><strong>Decide your criteria first.</strong> Accuracy, tone, length, format compliance and speed are different things, so know which one matters for this task before you read the outputs.</li>
+    <li><strong>Judge with a real example.</strong> Use a prompt from your actual work, not a toy question.</li>
+  </ul>
+
+  <h2>Cost and speed matter too</h2>
+  <p>The best answer is not always the right choice. If you are running a prompt thousands of times, such as tagging support tickets or extracting fields from documents, a smaller, faster model that is slightly less polished can be the better engineering decision. If you are writing something a customer will read, paying for stronger output usually makes sense. Pricing and speed change often, so check the current numbers on OpenRouter's model list instead of relying on a blog post, including this one.</p>
+
+  <h2>Think about context length</h2>
+  <p>Some tasks involve a lot of input: a long contract, a big chunk of code or many pages of notes. In those cases, the size of the context window and how well the model uses material buried in the middle of it becomes part of the decision. If the input is short, it barely matters. If it is long, test with your real material, because performance on long inputs can differ more than performance on short ones.</p>
+
+  <h2>A simple way to choose</h2>
+  <ul>
+    <li><strong>Need strict formatting or structured data?</strong> Start with GPT-4o and check the output parses cleanly.</li>
+    <li><strong>Need careful writing or lots of constraints followed?</strong> Start with Claude and compare tone against your style.</li>
+    <li><strong>Working with a very large input or images?</strong> Try Gemini and compare it against the others.</li>
+    <li><strong>High volume and low stakes?</strong> Try a smaller tier of each and measure how often the answer is good enough.</li>
+  </ul>
+  <p>These are starting points, not rules. Model names and versions change quickly, so use the list of current models in your OpenRouter account when you pick one.</p>
+
+  <h2>Mistakes people make when comparing</h2>
+  <ul>
+    <li><strong>Trusting a single run.</strong> Output varies, so one result can mislead you.</li>
+    <li><strong>Blaming the model for a weak prompt.</strong> If all three give vague answers, improve the prompt first. Our guide on <a href="how-to-write-better-prompts.html" style="color:var(--accent)">writing prompts that actually work</a> covers how.</li>
+    <li><strong>Copying a benchmark winner without testing.</strong> A model that tops a leaderboard may not be best on your task.</li>
+    <li><strong>Ignoring cost until the bill arrives.</strong> Estimate usage before you scale.</li>
+  </ul>
+
   <h2>The real answer: test it</h2>
   <p>Benchmarks change monthly and every provider improves at a different pace. The only way to know which model fits <em>your specific prompt</em> is to run it against more than one. That's the whole point of PromptLab's compare view — same prompt, multiple models, side by side, so you're deciding based on your actual use case instead of someone else's benchmark.</p>
 
+  <h2>Frequently asked questions</h2>
+
+  <h3>Which model is best overall?</h3>
+  <p>There isn't one best model. Each tends to be stronger at different things, and the rankings shift as providers release updates. The practical approach is to pick a sensible default, then test your own prompts against alternatives when quality or cost matters.</p>
+
+  <h3>Do the same prompts work across Claude, GPT-4o and Gemini?</h3>
+  <p>The structure of a good prompt, with a clear role, context, task and format, carries over well. Details like length, tone and how strictly instructions are followed can differ, so it is worth checking the output rather than assuming it will match.</p>
+
+  <h3>Should I use the cheapest model to save money?</h3>
+  <p>For simple, repeatable tasks like classification, extraction or short rewrites, a smaller and cheaper model is often good enough. For nuanced writing, complex reasoning or code, test whether the cheaper model's quality holds up before switching. Check current pricing on OpenRouter, because rates change.</p>
+
+  <h3>How often should I re-test my model choice?</h3>
+  <p>Whenever a provider releases a new version, or when you notice quality or cost problems. A saved set of three or four representative prompts makes re-testing quick.</p>
+
   <a href="app.html#compare" class="cta">COMPARE MODELS NOW →</a>
+  <div class="related">
+    <h2>Related guides</h2>
+    <a href="how-to-write-better-prompts.html">→ How to Write Prompts That Actually Work</a>
+    <a href="prompt-engineering-for-code.html">→ Prompt Engineering for Code Generation</a>
+    <a href="ai-marketing-copy-that-doesnt-sound-like-ai.html">→ Writing AI Marketing Copy That Doesn't Sound Like AI</a>
+    <a href="blog.html">→ All PromptLab guides</a>
+  </div>
 </main>
 <footer>PROMPTLAB — By GenesisVault · © 2026 GENESISVAULT.XYZ</footer>
 </body>

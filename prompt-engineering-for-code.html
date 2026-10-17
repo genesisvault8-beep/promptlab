@@ -28,7 +28,12 @@
   .prompt-example{background:#0a0a0c;border:1px solid var(--border);border-left:2px solid var(--accent);border-radius:6px;padding:16px 20px;margin:16px 0;font-size:13.5px;color:rgba(240,240,240,0.75);white-space:pre-wrap;}
   .cta{display:block;text-align:center;background:var(--accent);color:#0c0c0e;font-family:'Unbounded',sans-serif;font-weight:700;text-decoration:none;padding:16px;border-radius:8px;margin:40px 0;font-size:14px;}
   footer{position:relative;z-index:2;border-top:1px solid var(--border);padding:32px 5%;text-align:center;color:var(--dim);font-size:13px;}
+  .related{margin:48px 0 0;padding-top:24px;border-top:1px solid var(--border);}
+  .related h2{margin-top:0;}
+  .related a{display:block;color:var(--accent);text-decoration:none;padding:8px 0;font-size:14px;}
+  .related a:hover{text-decoration:underline;}
 </style>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Which AI model is best for code?", "acceptedAnswer": {"@type": "Answer", "text": "It depends on the language and the task, and the answer changes as models update. Claude and GPT-4o are both commonly used for code. Rather than trusting a general ranking, run your own prompt on both and compare, as we describe in our model comparison guide."}}, {"@type": "Question", "name": "Should I paste my whole codebase into the prompt?", "acceptedAnswer": {"@type": "Answer", "text": "Usually not. Paste only the files and functions that matter for the task, plus a short description of how they connect. Too much unrelated code buries the part the model should focus on, and it raises cost without improving the answer."}}, {"@type": "Question", "name": "How do I stop the model from inventing functions that don't exist?", "acceptedAnswer": {"@type": "Answer", "text": "You can't eliminate it, but you can reduce it. State the exact library and version, paste the relevant documentation or type signatures when you have them, and ask the model to flag anything it is unsure about. Then run the code and check unfamiliar calls against the official docs."}}, {"@type": "Question", "name": "Is AI-generated code safe to use in production?", "acceptedAnswer": {"@type": "Answer", "text": "Treat it like code from a new teammate: review it, test it and understand it before you merge it. Pay extra attention to input validation, authentication, error handling and anything that touches secrets or user data."}}]}</script>
 </head>
 <body>
 <div class="bg-glow"></div>
@@ -71,10 +76,72 @@
 
   <div class="prompt-example">Before writing the code, list any libraries or APIs you're not fully certain about. Then write the implementation. If you're guessing at a method name or signature, say so in a comment.</div>
 
+  <h2>Specify inputs, outputs and an example</h2>
+  <p>The clearest way to describe a function is to say what goes in, what comes out, and show one concrete case. It removes a whole class of misunderstandings about edge cases and return types:</p>
+  <div class="prompt-example">Write a JavaScript function parseDuration(str) that converts strings like "1h 30m" or "45s" into total seconds.
+Input: a string with any combination of h, m and s parts.
+Output: an integer number of seconds. Return null for invalid input.
+Example: parseDuration("1h 30m") returns 5400.
+No external libraries.</div>
+
+  <h2>Ask for tests alongside the code</h2>
+  <p>Requesting tests does two things. It forces the model to think through the cases, and it gives you something to run immediately. Ask for a handful of tests that include at least one edge case and one failure case, in the framework you actually use:</p>
+  <div class="prompt-example">Now write 5 unit tests for this function using Jest. Include an empty string, a malformed string, and a very large value. Tell me if any test depends on an assumption I should confirm.</div>
+
+  <h2>Debugging prompts that actually work</h2>
+  <p>"This doesn't work, fix it" gives the model almost nothing. A good debugging prompt contains four things: what you expected, what actually happened, the exact error message, and the smallest piece of code that reproduces the problem.</p>
+  <div class="prompt-example">Expected: the function returns a sorted list of unique emails.
+Actual: it returns duplicates when emails differ only by letter case.
+Error output: none, the result is just wrong.
+Code: [paste only the relevant function]
+Explain the cause first, then show the minimal fix. Don't refactor anything else.</div>
+
+  <h2>Use the model as a reviewer</h2>
+  <p>Models are often better at critiquing code than writing it perfectly on the first pass. After generating something, start a fresh prompt that reviews it with a specific lens, such as security, performance or readability:</p>
+  <div class="prompt-example">You are a security-minded reviewer. Review the code below for injection risks, missing input validation, unsafe use of user input in file paths or queries, and secrets in code. List each issue with severity and a one-line fix. If you find nothing, say so.</div>
+  <p>Setting this up as a reusable instruction is a good use of a system prompt. We explain the difference in <a href="system-prompts-vs-user-prompts.html" style="color:var(--accent)">System Prompts vs User Prompts</a>.</p>
+
+  <h2>Verify before you trust it</h2>
+  <ul>
+    <li><strong>Run it.</strong> Plausible-looking code that has never been executed is not a result.</li>
+    <li><strong>Check unfamiliar APIs</strong> against the official documentation, especially method names and argument order.</li>
+    <li><strong>Read every line you don't understand.</strong> If you can't explain it, ask the model to explain it before you ship it.</li>
+    <li><strong>Test the edges:</strong> empty input, very large input, wrong types and failure of any network or file call.</li>
+  </ul>
+
+  <h2>Common mistakes with code prompts</h2>
+  <ul>
+    <li><strong>Leaving out versions.</strong> Library behavior changes between releases, and the model may default to an older or newer API than you use.</li>
+    <li><strong>Asking for everything at once.</strong> Build in steps and review each one.</li>
+    <li><strong>Pasting secrets.</strong> Never include real API keys, tokens or passwords in a prompt. Replace them with placeholders.</li>
+    <li><strong>Accepting a rewrite when you asked for a fix.</strong> Say "change only what is needed" so the diff stays small and reviewable.</li>
+  </ul>
+
+  <h2>Frequently asked questions</h2>
+
+  <h3>Which AI model is best for code?</h3>
+  <p>It depends on the language and the task, and the answer changes as models update. Claude and GPT-4o are both commonly used for code. Rather than trusting a general ranking, run your own prompt on both and compare, as we describe in our <a href="claude-vs-gpt4o-vs-gemini.html" style="color:var(--accent)">model comparison guide</a>.</p>
+
+  <h3>Should I paste my whole codebase into the prompt?</h3>
+  <p>Usually not. Paste only the files and functions that matter for the task, plus a short description of how they connect. Too much unrelated code buries the part the model should focus on, and it raises cost without improving the answer.</p>
+
+  <h3>How do I stop the model from inventing functions that don't exist?</h3>
+  <p>You can't eliminate it, but you can reduce it. State the exact library and version, paste the relevant documentation or type signatures when you have them, and ask the model to flag anything it is unsure about. Then run the code and check unfamiliar calls against the official docs.</p>
+
+  <h3>Is AI-generated code safe to use in production?</h3>
+  <p>Treat it like code from a new teammate: review it, test it and understand it before you merge it. Pay extra attention to input validation, authentication, error handling and anything that touches secrets or user data.</p>
+
   <h2>Use PromptLab's code template</h2>
   <p>The code category in PromptLab's template library builds these patterns in by default — environment specification, style-matching, and edge-case prompts — so you're not rebuilding this structure from scratch every time you need working code fast.</p>
 
   <a href="app.html" class="cta">TRY THE CODE TEMPLATES →</a>
+  <div class="related">
+    <h2>Related guides</h2>
+    <a href="how-to-write-better-prompts.html">→ How to Write Prompts That Actually Work</a>
+    <a href="system-prompts-vs-user-prompts.html">→ System Prompts vs User Prompts: What's the Difference</a>
+    <a href="claude-vs-gpt4o-vs-gemini.html">→ Claude vs GPT-4o vs Gemini: Choosing the Right Model</a>
+    <a href="blog.html">→ All PromptLab guides</a>
+  </div>
 </main>
 <footer>PROMPTLAB — By GenesisVault · © 2026 GENESISVAULT.XYZ</footer>
 </body>

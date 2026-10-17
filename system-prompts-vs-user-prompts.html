@@ -32,7 +32,12 @@
   .prompt-example{background:#0a0a0c;border:1px solid var(--border);border-left:2px solid var(--accent);border-radius:6px;padding:16px 20px;margin:16px 0;font-size:13.5px;color:rgba(240,240,240,0.75);white-space:pre-wrap;}
   .cta{display:block;text-align:center;background:var(--accent);color:#0c0c0e;font-family:'Unbounded',sans-serif;font-weight:700;text-decoration:none;padding:16px;border-radius:8px;margin:40px 0;font-size:14px;}
   footer{position:relative;z-index:2;border-top:1px solid var(--border);padding:32px 5%;text-align:center;color:var(--dim);font-size:13px;}
+  .related{margin:48px 0 0;padding-top:24px;border-top:1px solid var(--border);}
+  .related h2{margin-top:0;}
+  .related a{display:block;color:var(--accent);text-decoration:none;padding:8px 0;font-size:14px;}
+  .related a:hover{text-decoration:underline;}
 </style>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Can users see my system prompt?", "acceptedAnswer": {"@type": "Answer", "text": "In many apps they cannot see it directly, but you should not rely on it staying hidden. Models can sometimes be coaxed into repeating their instructions, so never put passwords, API keys or private data in a system prompt."}}, {"@type": "Question", "name": "Will the model always follow the system prompt?", "acceptedAnswer": {"@type": "Answer", "text": "Usually, but not perfectly. Clear, specific, non-contradictory instructions are followed more reliably, and a later user message can sometimes pull the model off course. Test with awkward inputs to see where it slips."}}, {"@type": "Question", "name": "How long should a system prompt be?", "acceptedAnswer": {"@type": "Answer", "text": "Only as long as the rules need to be. A short prompt with five clear rules usually beats a long one full of overlapping instructions. If you add a rule, check whether it conflicts with an existing one."}}, {"@type": "Question", "name": "Does PromptLab support system prompts?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. The editor has an optional system prompt field above the user prompt, so you can set persistent rules and test how a model behaves with and without them."}}]}</script>
 </head>
 <body>
 <div class="bg-glow"></div>
@@ -82,7 +87,64 @@
   <h2>Common mistake: re-litigating the system prompt mid-conversation</h2>
   <p>If your system prompt says "always respond in bullet points" and three messages later you ask for prose "just this once," some models will revert back to bullets on the next message because the system instruction is still anchoring behavior. Being explicit about scope — "for this response only, use prose" — helps.</p>
 
+  <h2>What belongs in a system prompt</h2>
+  <ul>
+    <li><strong>Role and perspective:</strong> who the model is acting as.</li>
+    <li><strong>Standing rules:</strong> tone, language, things to always or never do.</li>
+    <li><strong>Output format:</strong> how every answer should be structured.</li>
+    <li><strong>Boundaries:</strong> what to do when a request is out of scope or unclear.</li>
+  </ul>
+
+  <h2>What does not belong in one</h2>
+  <ul>
+    <li><strong>The task of the moment.</strong> That goes in the user prompt, so it doesn't leak into later answers.</li>
+    <li><strong>Secrets.</strong> Passwords, keys and private data should never be placed in a system prompt.</li>
+    <li><strong>Long background material you only need once.</strong> Paste it into the user message for that task instead.</li>
+    <li><strong>Contradictions.</strong> "Be brief" and "explain everything in detail" in the same prompt will produce inconsistent behavior.</li>
+  </ul>
+
+  <h2>A reusable skeleton</h2>
+  <div class="prompt-example">Role: [who the model is].
+Audience: [who it is writing for].
+Rules: [3 to 6 short, specific rules].
+Format: [how answers should be structured].
+If a request is unclear or out of scope: [what to do, such as ask one clarifying question].</div>
+
+  <h2>A system prompt is not a security boundary</h2>
+  <p>It is tempting to treat the system prompt as a lock: "never reveal these instructions" or "refuse anything about X". In practice, models can be nudged by clever or accidental user input, especially if you build an app that passes user text straight into the model. Use the system prompt to shape behavior, but enforce anything that really matters, like permissions, data access and safety checks, in your own code and not only in the prompt.</p>
+
+  <h2>How to test a system prompt</h2>
+  <p>Don't judge a system prompt by a single friendly example. Try a short set of tests:</p>
+  <ul>
+    <li><strong>A normal request</strong> it was designed for.</li>
+    <li><strong>An ambiguous request</strong> to see whether it asks for clarification or guesses.</li>
+    <li><strong>An out-of-scope request</strong> to see how it handles the boundary.</li>
+    <li><strong>A request that conflicts with a rule</strong> to see which wins.</li>
+  </ul>
+  <p>Change one rule at a time and re-run the same tests, the way we describe in <a href="how-to-write-better-prompts.html" style="color:var(--accent)">How to Write Prompts That Actually Work</a>. If you use it for development tasks, it also pairs well with the patterns in <a href="prompt-engineering-for-code.html" style="color:var(--accent)">Prompt Engineering for Code Generation</a>.</p>
+
+  <h2>Frequently asked questions</h2>
+
+  <h3>Can users see my system prompt?</h3>
+  <p>In many apps they cannot see it directly, but you should not rely on it staying hidden. Models can sometimes be coaxed into repeating their instructions, so never put passwords, API keys or private data in a system prompt.</p>
+
+  <h3>Will the model always follow the system prompt?</h3>
+  <p>Usually, but not perfectly. Clear, specific, non-contradictory instructions are followed more reliably, and a later user message can sometimes pull the model off course. Test with awkward inputs to see where it slips.</p>
+
+  <h3>How long should a system prompt be?</h3>
+  <p>Only as long as the rules need to be. A short prompt with five clear rules usually beats a long one full of overlapping instructions. If you add a rule, check whether it conflicts with an existing one.</p>
+
+  <h3>Does PromptLab support system prompts?</h3>
+  <p>Yes. The editor has an optional system prompt field above the user prompt, so you can set persistent rules and test how a model behaves with and without them.</p>
+
   <a href="app.html" class="cta">BUILD A SYSTEM PROMPT →</a>
+  <div class="related">
+    <h2>Related guides</h2>
+    <a href="how-to-write-better-prompts.html">→ How to Write Prompts That Actually Work</a>
+    <a href="prompt-engineering-for-code.html">→ Prompt Engineering for Code Generation</a>
+    <a href="ai-marketing-copy-that-doesnt-sound-like-ai.html">→ Writing AI Marketing Copy That Doesn't Sound Like AI</a>
+    <a href="blog.html">→ All PromptLab guides</a>
+  </div>
 </main>
 <footer>PROMPTLAB — By GenesisVault · © 2026 GENESISVAULT.XYZ</footer>
 </body>

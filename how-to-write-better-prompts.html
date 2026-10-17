@@ -30,7 +30,17 @@
   .prompt-example{background:#0a0a0c;border:1px solid var(--border);border-left:2px solid var(--accent);border-radius:6px;padding:16px 20px;margin:16px 0;font-size:13.5px;color:rgba(240,240,240,0.75);white-space:pre-wrap;}
   .cta{display:block;text-align:center;background:var(--accent);color:#0c0c0e;font-family:'Unbounded',sans-serif;font-weight:700;text-decoration:none;padding:16px;border-radius:8px;margin:40px 0;font-size:14px;}
   footer{position:relative;z-index:2;border-top:1px solid var(--border);padding:32px 5%;text-align:center;color:var(--dim);font-size:13px;}
+  .related{margin:48px 0 0;padding-top:24px;border-top:1px solid var(--border);}
+  .related h2{margin-top:0;}
+  .related a{display:block;color:var(--accent);text-decoration:none;padding:8px 0;font-size:14px;}
+  .related a:hover{text-decoration:underline;}
 </style>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[
+{"@type":"Question","name":"How long should a prompt be?","acceptedAnswer":{"@type":"Answer","text":"As long as it needs to be to remove guesswork, and no longer. A precise four-sentence prompt beats a rambling page of background."}},
+{"@type":"Question","name":"Do I always need to start with 'You are...'?","acceptedAnswer":{"@type":"Answer","text":"No. A role helps most when the task depends on expertise or perspective, like review, critique or copywriting. For simple lookups or rewrites, clear context and task are enough."}},
+{"@type":"Question","name":"Will the same prompt work on Claude, ChatGPT and Gemini?","acceptedAnswer":{"@type":"Answer","text":"Usually the structure carries over, but each model has its own habits in tone, length and formatting. Run the same prompt side by side and compare."}},
+{"@type":"Question","name":"Why do I get different answers from the same prompt?","acceptedAnswer":{"@type":"Answer","text":"Models sample their output, and the temperature setting controls how much randomness is involved. Lower values give steadier answers, higher values give more varied ones."}}
+]}</script>
 </head>
 <body>
 <div class="bg-glow"></div>
@@ -50,20 +60,24 @@
   </div>
 
 
+  <h2>Why most prompts fail</h2>
+  <p>A language model doesn't know what you meant. It only knows what you wrote, and it predicts the most likely useful response to that text. When the prompt is vague, the most likely response is an average one: safe, generic, a little long, and aimed at nobody in particular. That's why "write me a blog post about love" gives you the same polished-but-empty article everyone else gets.</p>
+  <p>The fix isn't a magic phrase. It's removing the guesswork. Every detail you leave out is a decision the model makes for you, and it makes the safest one.</p>
+
   <h2>The four parts of a working prompt</h2>
   <p>Every prompt that reliably produces good output has some version of these four elements, even if they're not labeled:</p>
 
   <h3>1. Role</h3>
-  <p>Tell the model what perspective to answer from. Not "you are a helpful assistant" — that's the default anyway. Be specific: "you are a senior backend engineer reviewing this code for production readiness" changes the vocabulary, the assumptions, and the level of detail you get back.</p>
+  <p>Tell the model what perspective to answer from. Not "you are a helpful assistant" — that's the default anyway. Be specific: "you are a senior backend engineer reviewing this code for production readiness" changes the vocabulary, the assumptions, and the level of detail you get back. A good role answers two questions: who is speaking, and what do they care about?</p>
 
   <h3>2. Context</h3>
-  <p>Models can't read your mind or your codebase. If the task depends on constraints — a tech stack, an audience, a tone, a prior decision you've already made — state it. Omitted context is the single biggest cause of generic output.</p>
+  <p>Models can't read your mind or your codebase. If the task depends on constraints — a tech stack, an audience, a tone, a prior decision you've already made — state it. Omitted context is the single biggest cause of generic output. A useful test: if you handed this prompt to a smart freelancer who knew nothing about your project, would they have what they need?</p>
 
   <h3>3. Task</h3>
-  <p>Say exactly what you want done, as a verb: "summarize," "rewrite," "critique," "generate three variations," "find the bug." Vague tasks like "help me with this" force the model to guess your intent, and it will guess conservatively.</p>
+  <p>Say exactly what you want done, as a verb: "summarize," "rewrite," "critique," "generate three variations," "find the bug." Vague tasks like "help me with this" force the model to guess your intent, and it will guess conservatively. One prompt should carry one main task.</p>
 
   <h3>4. Format</h3>
-  <p>Specify how you want the answer structured — bullet points, a table, JSON, under 200 words, no preamble. Without this, models default to a safe middle ground: some prose, some structure, usually longer than you wanted.</p>
+  <p>Specify how you want the answer structured — bullet points, a table, JSON, under 200 words, no preamble. Without this, models default to a safe middle ground: some prose, some structure, usually longer than you wanted. Format instructions also make output easier to reuse, because you know what shape it will arrive in.</p>
 
   <h2>A before-and-after example</h2>
   <p>Weak prompt:</p>
@@ -74,18 +88,87 @@
 
   <p>The second version doesn't just get you a better answer — it gets you a <em>predictable</em> answer, which is what actually matters when you're iterating.</p>
 
+  <h2>A second example: code review</h2>
+  <p>Weak prompt:</p>
+  <div class="prompt-example">Review this function.</div>
+
+  <p>Strong prompt:</p>
+  <div class="prompt-example">You are a senior engineer doing a pre-merge review of a Node.js API handler. Check for: unhandled errors, missing input validation, and anything that could block the event loop. List each issue with the line it affects and a one-line fix. If the code is fine, say so in one sentence. Do not rewrite the whole function.</div>
+
+  <p>Notice what changed. The role sets the standard, the checklist narrows the search, the output format makes the review scannable, and the last line stops the model from doing more than you asked.</p>
+
+  <h2>Use examples when format matters</h2>
+  <p>Sometimes describing the output is harder than showing it. Include one or two short examples of what a good answer looks like, and the model will match the pattern. This is often called few-shot prompting, and it's especially useful for tone, naming conventions, classification labels and anything with a strict structure:</p>
+  <div class="prompt-example">Classify each support message as BUG, BILLING, or FEATURE. Reply with the label only.
+
+Message: "I was charged twice this month" → BILLING
+Message: "The export button does nothing on Safari" → BUG
+Message: "Can you add dark mode?" →</div>
+
+  <h2>Set constraints, including what to exclude</h2>
+  <p>Constraints stop the model from drifting. Useful ones include length ("under 120 words"), audience ("for a non-technical founder"), style ("no jargon, no buzzwords") and scope ("only use the information below"). Telling the model what <em>not</em> to do is often faster than describing everything you do want.</p>
+
+  <h2>Iterate with one change at a time</h2>
+  <p>Prompting is a loop, not a single shot. When the output is off, resist rewriting everything. Instead:</p>
+  <ol>
+    <li><strong>Run it</strong> and read the output critically.</li>
+    <li><strong>Diagnose the gap.</strong> Is it the wrong tone, missing context, wrong length or wrong structure?</li>
+    <li><strong>Change one thing</strong> that addresses that gap.</li>
+    <li><strong>Run it again</strong> and compare to the last version.</li>
+  </ol>
+  <p>Changing one variable at a time is how you learn what actually moves the output. If you change five things and the result improves, you won't know which one mattered.</p>
+
   <h2>Common mistakes</h2>
   <ul>
     <li><strong>Stacking too many tasks in one prompt.</strong> "Write this, then critique it, then rewrite it" tends to produce a rushed version of all three. Split into separate turns.</li>
     <li><strong>Assuming the model remembers your style.</strong> Unless you're in the same conversation, restate tone and constraints each time.</li>
     <li><strong>Not specifying what to exclude.</strong> "Don't use corporate jargon" or "no bullet points" is often more useful than describing what you do want.</li>
     <li><strong>Treating the first output as final.</strong> Prompt engineering is iterative — refine based on what came back rather than starting over.</li>
+    <li><strong>Burying the task.</strong> Put the instruction clearly, not after three paragraphs of background. Models weigh clear instructions more reliably than hints.</li>
   </ul>
+
+  <h2>A reusable template</h2>
+  <p>When you're unsure where to start, fill in this skeleton and delete what you don't need:</p>
+  <div class="prompt-example">You are [specific role].
+Context: [who it's for, what it's for, anything the model must know].
+Task: [one clear verb and object].
+Constraints: [length, tone, things to avoid].
+Format: [bullets, table, JSON, number of items].</div>
+
+  <h2>Quick checklist before you hit send</h2>
+  <ul>
+    <li>Did I give the model a specific role, not just "assistant"?</li>
+    <li>Does it know who the output is for?</li>
+    <li>Is there one clear task, stated as a verb?</li>
+    <li>Did I say how long and in what shape the answer should be?</li>
+    <li>Did I say what to leave out?</li>
+  </ul>
+
+  <h2>Frequently asked questions</h2>
+
+  <h3>How long should a prompt be?</h3>
+  <p>As long as it needs to be to remove guesswork, and no longer. A precise four-sentence prompt beats a rambling page of background. Add length only when it adds information the model needs.</p>
+
+  <h3>Do I always need to start with "You are..."?</h3>
+  <p>No. A role helps most when the task depends on expertise or perspective, like review, critique or copywriting. For simple lookups or rewrites, clear context and task are enough.</p>
+
+  <h3>Will the same prompt work on Claude, ChatGPT and Gemini?</h3>
+  <p>Usually the structure carries over, but each model has its own habits in tone, length and formatting. The reliable way to find out is to run the same prompt side by side and compare, which is what PromptLab's Compare tab is for.</p>
+
+  <h3>Why do I get different answers from the same prompt?</h3>
+  <p>Models sample their output, and the temperature setting controls how much randomness that involves. Lower values give steadier, more repeatable answers. Higher values give more varied, creative ones. For factual or structured tasks, go lower. For brainstorming and writing, go higher.</p>
 
   <h2>Where this fits into PromptLab</h2>
   <p>PromptLab's auto-engineer feature applies this framework automatically — you give it a rough idea, and it fills in role, context, format, and task structure before sending it to the model. The template library takes this further with pre-built structures for common jobs like code review, marketing copy, and security analysis, so you're not rebuilding the same scaffolding every time.</p>
 
   <a href="app.html" class="cta">TRY THE PROMPT ENGINEER →</a>
+  <div class="related">
+    <h2>Related guides</h2>
+    <a href="system-prompts-vs-user-prompts.html">→ System Prompts vs User Prompts: What's the Difference</a>
+    <a href="prompt-engineering-for-code.html">→ Prompt Engineering for Code Generation</a>
+    <a href="claude-vs-gpt4o-vs-gemini.html">→ Claude vs GPT-4o vs Gemini: Choosing the Right Model</a>
+    <a href="blog.html">→ All PromptLab guides</a>
+  </div>
 </main>
 <footer>PROMPTLAB — By GenesisVault · © 2026 GENESISVAULT.XYZ</footer>
 </body>
