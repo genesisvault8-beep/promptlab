@@ -1,4 +1,4 @@
-const CACHE = 'promptlab-v10';
+const CACHE = 'promptlab-v12';
 const SHELL = [
   '/',
   '/index.html',
