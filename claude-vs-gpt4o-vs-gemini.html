@@ -48,6 +48,16 @@
   .related h2{margin-top:0;}
   .related a{display:block;color:var(--accent);text-decoration:none;padding:8px 0;font-size:14px;}
   .related a:hover{text-decoration:underline;}
+  .store-box{margin:48px 0 0;padding:22px 24px;background:var(--card);border:1px solid var(--border);border-left:2px solid var(--accent);border-radius:10px;}
+  .store-tag{color:var(--blue);font-size:12px;letter-spacing:2px;text-transform:uppercase;margin-bottom:10px;}
+  .store-box h2{margin:0 0 8px;}
+  .store-box p{margin-bottom:14px;}
+  .store-item{display:block;text-decoration:none;padding:12px 14px;margin-bottom:10px;border:1px solid var(--border);border-radius:8px;background:#0a0a0c;color:var(--text);}
+  .store-item:hover{border-color:rgba(232,255,71,0.35);}
+  .store-item strong{display:block;font-size:14px;color:var(--accent);margin-bottom:4px;}
+  .store-item span{display:block;font-size:13px;line-height:1.6;color:rgba(240,240,240,0.7);}
+  .store-link{display:inline-block;color:var(--accent);text-decoration:none;font-size:14px;margin-top:4px;}
+  .store-link:hover{text-decoration:underline;}
 </style>
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Which model is best overall?", "acceptedAnswer": {"@type": "Answer", "text": "There isn't one best model. Each tends to be stronger at different things, and the rankings shift as providers release updates. The practical approach is to pick a sensible default, then test your own prompts against alternatives when quality or cost matters."}}, {"@type": "Question", "name": "Do the same prompts work across Claude, GPT-4o and Gemini?", "acceptedAnswer": {"@type": "Answer", "text": "The structure of a good prompt, with a clear role, context, task and format, carries over well. Details like length, tone and how strictly instructions are followed can differ, so it is worth checking the output rather than assuming it will match."}}, {"@type": "Question", "name": "Should I use the cheapest model to save money?", "acceptedAnswer": {"@type": "Answer", "text": "For simple, repeatable tasks like classification, extraction or short rewrites, a smaller and cheaper model is often good enough. For nuanced writing, complex reasoning or code, test whether the cheaper model's quality holds up before switching. Check current pricing on OpenRouter, because rates change."}}, {"@type": "Question", "name": "How often should I re-test my model choice?", "acceptedAnswer": {"@type": "Answer", "text": "Whenever a provider releases a new version, or when you notice quality or cost problems. A saved set of three or four representative prompts makes re-testing quick."}}]}</script>
 </head>
@@ -146,6 +156,20 @@
   </div>
 
 <a href="app.html#compare" class="cta">COMPARE MODELS NOW →</a>
+  <div class="store-box">
+    <div class="store-tag">// From the store</div>
+    <h2>Want ready-made prompts?</h2>
+    <p>I build and sell prompts on PromptBase. Two to start with:</p>
+    <a class="store-item" href="https://promptbase.com/prompt/zuse-output-auditor-2" target="_blank" rel="noopener">
+      <strong>Zuse Output Auditor — $8.99</strong>
+      <span>Checks any AI output against your rules. You get a PASS/FAIL per rule, the exact quoted failures, and one verdict.</span>
+    </a>
+    <a class="store-item" href="https://promptbase.com/prompt/answer-verifier" target="_blank" rel="noopener">
+      <strong>Answer Verifier — $8.99</strong>
+      <span>Paste an AI answer plus the real source text. Each claim is marked verified, unverifiable or contradicted.</span>
+    </a>
+    <a class="store-link" href="https://promptbase.com/profile/uniquecodes0" target="_blank" rel="noopener">See all my prompts on PromptBase →</a>
+  </div>
   <div class="related">
     <h2>Related guides</h2>
     <a href="how-to-write-better-prompts.html">→ How to Write Prompts That Actually Work</a>

@@ -48,6 +48,16 @@
   .related h2{margin-top:0;}
   .related a{display:block;color:var(--accent);text-decoration:none;padding:8px 0;font-size:14px;}
   .related a:hover{text-decoration:underline;}
+  .store-box{margin:48px 0 0;padding:22px 24px;background:var(--card);border:1px solid var(--border);border-left:2px solid var(--accent);border-radius:10px;}
+  .store-tag{color:var(--blue);font-size:12px;letter-spacing:2px;text-transform:uppercase;margin-bottom:10px;}
+  .store-box h2{margin:0 0 8px;}
+  .store-box p{margin-bottom:14px;}
+  .store-item{display:block;text-decoration:none;padding:12px 14px;margin-bottom:10px;border:1px solid var(--border);border-radius:8px;background:#0a0a0c;color:var(--text);}
+  .store-item:hover{border-color:rgba(232,255,71,0.35);}
+  .store-item strong{display:block;font-size:14px;color:var(--accent);margin-bottom:4px;}
+  .store-item span{display:block;font-size:13px;line-height:1.6;color:rgba(240,240,240,0.7);}
+  .store-link{display:inline-block;color:var(--accent);text-decoration:none;font-size:14px;margin-top:4px;}
+  .store-link:hover{text-decoration:underline;}
 </style>
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Can users see my system prompt?", "acceptedAnswer": {"@type": "Answer", "text": "In many apps they cannot see it directly, but you should not rely on it staying hidden. Models can sometimes be coaxed into repeating their instructions, so never put passwords, API keys or private data in a system prompt."}}, {"@type": "Question", "name": "Will the model always follow the system prompt?", "acceptedAnswer": {"@type": "Answer", "text": "Usually, but not perfectly. Clear, specific, non-contradictory instructions are followed more reliably, and a later user message can sometimes pull the model off course. Test with awkward inputs to see where it slips."}}, {"@type": "Question", "name": "How long should a system prompt be?", "acceptedAnswer": {"@type": "Answer", "text": "Only as long as the rules need to be. A short prompt with five clear rules usually beats a long one full of overlapping instructions. If you add a rule, check whether it conflicts with an existing one."}}, {"@type": "Question", "name": "Does PromptLab support system prompts?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. The editor has an optional system prompt field above the user prompt, so you can set persistent rules and test how a model behaves with and without them."}}]}</script>
 </head>
@@ -151,6 +161,20 @@ If a request is unclear or out of scope: [what to do, such as ask one clarifying
   </div>
 
 <a href="app.html" class="cta">BUILD A SYSTEM PROMPT →</a>
+  <div class="store-box">
+    <div class="store-tag">// From the store</div>
+    <h2>Want ready-made prompts?</h2>
+    <p>I build and sell prompts on PromptBase. Two to start with:</p>
+    <a class="store-item" href="https://promptbase.com/prompt/zuse-output-auditor-2" target="_blank" rel="noopener">
+      <strong>Zuse Output Auditor — $8.99</strong>
+      <span>Checks any AI output against your rules. You get a PASS/FAIL per rule, the exact quoted failures, and one verdict.</span>
+    </a>
+    <a class="store-item" href="https://promptbase.com/prompt/answer-verifier" target="_blank" rel="noopener">
+      <strong>Answer Verifier — $8.99</strong>
+      <span>Paste an AI answer plus the real source text. Each claim is marked verified, unverifiable or contradicted.</span>
+    </a>
+    <a class="store-link" href="https://promptbase.com/profile/uniquecodes0" target="_blank" rel="noopener">See all my prompts on PromptBase →</a>
+  </div>
   <div class="related">
     <h2>Related guides</h2>
     <a href="how-to-write-better-prompts.html">→ How to Write Prompts That Actually Work</a>
