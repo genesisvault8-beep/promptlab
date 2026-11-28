@@ -458,6 +458,44 @@
     opacity: 0; transition: all 0.3s; z-index: 2000; white-space: nowrap;
   }
   .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  /* ── SHOP ── */
+  .shop-intro { font-size: 11px; color: var(--dim); line-height: 1.7; margin-bottom: 16px; }
+  .shop-group { margin-bottom: 18px; }
+  .shop-list { display: flex; flex-direction: column; gap: 10px; }
+  .shop-card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 4px; padding: 14px; transition: border-color 0.15s;
+  }
+  .shop-card:hover { border-color: var(--accent-dim); }
+  .shop-card.is-free { border-color: rgba(71,255,180,0.25); }
+  .shop-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; margin-bottom: 8px; }
+  .shop-name { font-family: 'Unbounded', sans-serif; font-size: 12px; font-weight: 700; color: var(--text); line-height: 1.4; }
+  .shop-price {
+    flex-shrink: 0; font-size: 10px; letter-spacing: 1px; padding: 3px 8px;
+    border-radius: 3px; border: 1px solid var(--accent-dim); color: var(--accent);
+    background: rgba(232,255,71,0.05);
+  }
+  .shop-price.free { border-color: rgba(71,255,180,0.35); color: var(--green); background: rgba(71,255,180,0.06); }
+  .shop-desc { font-size: 11px; color: rgba(240,240,240,0.65); line-height: 1.7; margin-bottom: 10px; }
+  .shop-meta { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
+  .shop-tag {
+    font-size: 8px; letter-spacing: 1px; padding: 2px 7px; border-radius: 3px;
+    border: 1px solid var(--border); color: var(--dim); text-transform: uppercase;
+  }
+  .shop-btn {
+    display: block; text-align: center; text-decoration: none;
+    background: var(--accent); color: #0c0c0e; border-radius: 4px;
+    font-family: 'Unbounded', sans-serif; font-weight: 700;
+    font-size: 10px; letter-spacing: 2px; padding: 11px;
+  }
+  .shop-btn.ghost { background: transparent; color: var(--accent); border: 1px solid var(--accent-dim); }
+  .shop-empty {
+    border: 1px dashed var(--border); border-radius: 4px; padding: 14px;
+    font-size: 11px; color: var(--dim); line-height: 1.7;
+  }
+  .shop-empty a { color: var(--accent); }
+  .shop-foot { font-size: 9px; color: var(--dim); line-height: 1.7; text-align: center; margin-top: 6px; padding-bottom: 10px; }
 </style>
 </head>
 <body>
@@ -477,6 +515,7 @@
   <button class="tab" onclick="switchTab('compare', this)">COMPARE</button>
   <button class="tab" onclick="switchTab('saved', this)">SAVED</button>
   <button class="tab" onclick="switchTab('agent', this)">⚡ AGENT</button>
+  <button class="tab" onclick="switchTab('shop', this)">SHOP</button>
 </div>
 
 <!-- LOADING BAR -->
@@ -565,6 +604,23 @@
         <button class="cat-btn" onclick="filterCat(this,'analysis')">ANALYSIS</button>
       </div>
       <div class="prompt-cards" id="prompt-cards"></div>
+    </div>
+  </div>
+
+  <!-- SHOP -->
+  <div class="panel" id="panel-shop">
+    <div class="scroll">
+      <div class="shop-intro">Ready-made prompts built with PromptLab. Each one is sold on PromptBase, where you can see examples and buy safely.</div>
+      <div class="shop-group">
+        <div class="sec-label">FREE PROMPTS</div>
+        <div class="shop-list" id="shop-free"></div>
+      </div>
+      <div class="shop-group">
+        <div class="sec-label">PREMIUM PROMPTS</div>
+        <div class="shop-list" id="shop-paid"></div>
+      </div>
+      <a class="shop-btn ghost" href="https://promptbase.com/profile/uniquecodes0" target="_blank" rel="noopener noreferrer">VIEW FULL STORE ON PROMPTBASE →</a>
+      <div class="shop-foot">Purchases happen on PromptBase. PromptLab never sees your payment details.</div>
     </div>
   </div>
 
@@ -1070,6 +1126,73 @@ function switchTab(name, btn) {
   });
   if (name === 'library') renderLibrary();
   if (name === 'saved') renderSaved();
+  if (name === 'shop') renderShop();
+}
+
+// ══════════════════════════════════════
+// SHOP  (add new items to SHOP_ITEMS; price: 0 shows as FREE)
+// ══════════════════════════════════════
+const SHOP_ITEMS = [
+  {
+    name: 'Zuse Output Auditor',
+    desc: 'Turns any AI into a strict QA auditor. Give it your content and your rules, and it returns a PASS/FAIL checklist, the exact quoted location of every failure, and one binary verdict: conforms or fails.',
+    model: 'Grok 4.5',
+    uses: 'Marketing copy · Emails · Docs · Reports',
+    price: 8.99,
+    url: 'https://promptbase.com/prompt/zuse-output-auditor-2'
+  },
+  {
+    name: 'Answer Verifier',
+    desc: 'Paste an AI answer plus the real source text. Get a claim-by-claim breakdown (verified, unverifiable or contradicted), every overconfident phrase quoted, and one verdict: trustworthy or flagged.',
+    model: 'Grok 4.5',
+    uses: 'Fact-checking · Reports · AI answers',
+    price: 8.99,
+    url: 'https://promptbase.com/prompt/answer-verifier'
+  }
+];
+
+function renderShop() {
+  const free = document.getElementById('shop-free');
+  const paid = document.getElementById('shop-paid');
+  if (!free || !paid) return;
+  free.innerHTML = ''; paid.innerHTML = '';
+
+  const makeCard = (item) => {
+    const isFree = !item.price;
+    const card = document.createElement('div');
+    card.className = 'shop-card' + (isFree ? ' is-free' : '');
+
+    const head = document.createElement('div'); head.className = 'shop-head';
+    const name = document.createElement('div'); name.className = 'shop-name'; name.textContent = item.name;
+    const price = document.createElement('div'); price.className = 'shop-price' + (isFree ? ' free' : '');
+    price.textContent = isFree ? 'FREE' : '$' + Number(item.price).toFixed(2);
+    head.appendChild(name); head.appendChild(price);
+
+    const desc = document.createElement('div'); desc.className = 'shop-desc'; desc.textContent = item.desc;
+
+    const meta = document.createElement('div'); meta.className = 'shop-meta';
+    [item.model, item.uses].filter(Boolean).forEach(t => {
+      const tag = document.createElement('span'); tag.className = 'shop-tag'; tag.textContent = t; meta.appendChild(tag);
+    });
+
+    const btn = document.createElement('a'); btn.className = 'shop-btn';
+    btn.href = item.url; btn.target = '_blank'; btn.rel = 'noopener noreferrer';
+    btn.textContent = isFree ? 'GET IT FREE ON PROMPTBASE →' : 'GET IT ON PROMPTBASE →';
+
+    card.appendChild(head); card.appendChild(desc); card.appendChild(meta); card.appendChild(btn);
+    return card;
+  };
+
+  const freeItems = SHOP_ITEMS.filter(i => !i.price);
+  const paidItems = SHOP_ITEMS.filter(i => i.price);
+
+  if (freeItems.length) freeItems.forEach(i => free.appendChild(makeCard(i)));
+  else {
+    const e = document.createElement('div'); e.className = 'shop-empty';
+    e.innerHTML = 'Free prompts are coming soon. Follow the store on <a href="https://promptbase.com/profile/uniquecodes0" target="_blank" rel="noopener noreferrer">PromptBase</a> to get them first.';
+    free.appendChild(e);
+  }
+  paidItems.forEach(i => paid.appendChild(makeCard(i)));
 }
 
 // ══════════════════════════════════════
